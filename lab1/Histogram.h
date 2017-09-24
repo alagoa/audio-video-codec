@@ -25,5 +25,5 @@ class Histogram {
 
 		std::vector<std::pair<int,int>> vec;
 		int min, max, n_bins;
-		bin bins[20000];
+		bin bins[200000];
 };

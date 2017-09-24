@@ -14,29 +14,46 @@ Histogram::Histogram(int min, int max, int n_bins, std::string input) {
 	this->max = max;
 	this->n_bins = n_bins;
 	//std::cout << "goin to calculateBins";
-	calculateBins();
-	//std::cout << "calculated Bins!";
-
-	// std::cout << input;
-
 	std::stringstream stream;
-	stream << input;
+	stream << input;		
 	std::map<int, int> map;
 
-	while(1) {
+	if(n_bins != 0) {
+
+		calculateBins();
 		int n;
-		stream >> n;
-   		int bin_idx = getBin(n);
-   		
-		if(map.count(bin_idx) == 0) {
-			map[bin_idx] = 1;
+		while(stream >> n) {			
+	   		int bin_idx = getBin(n);
+	   		
+			if(map.count(bin_idx) == 0) {
+				map[bin_idx] = 1;
+			}
+			else {
+				map[bin_idx] = map.find(bin_idx)->second + 1;
+			}		
+			if(!stream)
+	      		break;
 		}
-		else {
-			map[bin_idx] = map.find(bin_idx)->second + 1;
-		}		
-		if(!stream)
-      		break;
 	}
+	
+	else {
+		int n;
+		while(stream >> n) {			
+	   		//int bin_idx = getBin(n);
+			if(map.count(n) == 0) {
+				map[n] = 1;
+			}
+			else {
+				map[n] = map.find(n)->second + 1;
+			}		
+			if(!stream)
+	      		break;
+		}
+	}
+	
+	
+	//std::cout << "calculated Bins!";
+	// std::cout << input;
 
 	typedef std::pair<int, int> elem;
 	for (std::map<int,int>::iterator it=map.begin(); it!=map.end(); ++it) {
@@ -88,12 +105,24 @@ void Histogram::printHistogramByValue() {
 		}
 	}
 	*/
-	for(auto &e : vec) {
-		out << "\n[" << bins[e.first].min << " , " << bins[e.first].max << "] \t";
 
-		for(int stars = 0; stars < e.second; stars++) {
-			out << "*";
-		}
+	if(n_bins != 0) {
+		for(auto &e : vec) {
+			out << "\n[" << bins[e.first].min << " , " << bins[e.first].max << "] \t\t\t";
+
+			for(int stars = 0; stars < e.second; stars++) {
+				out << "*";
+			}
+		}	
+	}
+	else {
+		for(auto &e : vec) {
+			out << "\n[" << e.first << "] \t";
+
+			for(int stars = 0; stars < e.second; stars++) {
+				out << "*";
+			}
+		}	
 	}
 
 	std::cout << out.str() + "\n";
@@ -109,12 +138,23 @@ void Histogram::printHistogramByOccurency() {
     	return left.second < right.second;	
 	});
 
-	for(auto &e : tmp) {
-		out << "\n[" << bins[e.first].min << " , " << bins[e.first].max << "] \t";
+	if(n_bins != 0) {
+		for(auto &e : tmp) {
+			out << "\n[" << bins[e.first].min << " , " << bins[e.first].max << "] \t\t\t";
 
-		for(int stars = 0; stars < e.second; stars++) {
-			out << "*";
-		}
+			for(int stars = 0; stars < e.second; stars++) {
+				out << "*";
+			}
+		}	
+	}
+	else {
+		for(auto &e : tmp) {
+			out << "\n[" << e.first << "] \t";
+
+			for(int stars = 0; stars < e.second; stars++) {
+				out << "*";
+			}
+		}	
 	}
 
 	std::cout << out.str();
@@ -123,8 +163,15 @@ void Histogram::printHistogramByOccurency() {
 
 
 void Histogram::printValues() {
-	for(auto &e : vec) {
-		std::cout << "[" << bins[e.first].min << " , " << bins[e.first].max << "] = " << e.second << '\n';
+	if(n_bins != 0) {
+		for(auto &e : vec) {
+			std::cout << "[" << bins[e.first].min << " , " << bins[e.first].max << "] = " << e.second << '\n';
+		}
+	}
+	else {
+		for(auto &e : vec) {
+			std::cout << "[" << e.first << "] = " << e.second << '\n';
+		}
 	}
 }
 
@@ -138,12 +185,23 @@ void Histogram::saveHistogram() {
 
 	std::stringstream out;
  
-	for(auto &e : tmp) {
-		out << "\n[" << bins[e.first].min << " , " << bins[e.first].max << "] \t ";
+	if(n_bins != 0) {
+		for(auto &e : tmp) {
+			out << "\n[" << bins[e.first].min << " , " << bins[e.first].max << "] \t\t\t";
 
-		for(int stars = 0; stars < e.second; stars++) {
-			out << "*";
-		}
+			for(int stars = 0; stars < e.second; stars++) {
+				out << "*";
+			}
+		}	
+	}
+	else {
+		for(auto &e : tmp) {
+			out << "\n[" << e.first << "] \t\t\t";
+
+			for(int stars = 0; stars < e.second; stars++) {
+				out << "*";
+			}
+		}	
 	}
 
 	fout << out.str();

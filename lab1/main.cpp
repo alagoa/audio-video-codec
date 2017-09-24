@@ -44,9 +44,9 @@ int main(int argc, char* argv[]) {
     Histogram h (min, max, bins, input.str());
     
 	//h.printValues();
-	//h.printHistogramByValue();
+	h.printHistogramByValue();
 	//std::cout << h.uniqueSymbols();
-	h.printHistogramByOccurency();
+	//h.printHistogramByOccurency();
 	h.saveHistogram();
 
 	return 0;
