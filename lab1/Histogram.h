@@ -1,6 +1,12 @@
 #include <string>
-#include <vector>
 #include <sstream>
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <map>
+#include <algorithm>
+#include <fstream>
+#include <vector>
 
 struct bin
 {
@@ -12,7 +18,6 @@ class Histogram {
 	public:
 		Histogram(int min, int max, int n_bins, std::string input);
 		~Histogram();
-
 		void printHistogramByValue();
 		void printHistogramByOccurency();
 		void printValues();
@@ -22,7 +27,6 @@ class Histogram {
 	private:
 		void calculateBins();
 		int getBin(int number);
-
 		std::vector<std::pair<int,int>> vec;
 		int min, max, n_bins;
 		bin bins[200000];

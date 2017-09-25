@@ -1,9 +1,4 @@
 #include "Histogram.h"
-
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
 #include <climits> 
 
 std::stringstream readFileStream() {
@@ -17,12 +12,10 @@ std::stringstream readFileStream() {
 }
 
 int main(int argc, char* argv[]) {
-	
 	if(argc < 2) {
 		std::cout << "Usage: ./out <number of bins>\n";
 		return 0;
 	}
-
 	std::ifstream fin("wavsample01.txt");
     int min = INT_MAX,max = INT_MIN, i=0, n;
     while (fin >> n){

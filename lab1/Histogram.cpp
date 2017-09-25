@@ -1,14 +1,6 @@
 #include "Histogram.h"
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <map>
-#include <algorithm>
-#include <fstream>
-#include <vector>
 
 Histogram::Histogram(int min, int max, int n_bins, std::string input) {
-
 	//std::cout << "i'm in";
 	this->min = min;
 	this->max = max;
@@ -19,7 +11,6 @@ Histogram::Histogram(int min, int max, int n_bins, std::string input) {
 	std::map<int, int> map;
 
 	if(n_bins != 0) {
-
 		calculateBins();
 		int n;
 		while(stream >> n) {			
@@ -35,7 +26,6 @@ Histogram::Histogram(int min, int max, int n_bins, std::string input) {
 	      		break;
 		}
 	}
-	
 	else {
 		int n;
 		while(stream >> n) {			
@@ -55,7 +45,6 @@ Histogram::Histogram(int min, int max, int n_bins, std::string input) {
 	//std::cout << "calculated Bins!";
 	// std::cout << input;
 
-	typedef std::pair<int, int> elem;
 	for (std::map<int,int>::iterator it=map.begin(); it!=map.end(); ++it) {
 		vec.push_back(std::make_pair(it->first, it->second));
 	}
