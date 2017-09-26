@@ -1,6 +1,15 @@
+#include <iostream>
 #include <string>
-#include <vector>
 #include <sstream>
+#include <map>
+#include <algorithm>
+#include <fstream>
+#include <vector>
+#include <climits>
+
+
+#define NUMERIC_MODE 0
+#define ALPHA_MODE 1
 
 struct bin
 {
@@ -10,7 +19,7 @@ struct bin
 
 class Histogram {
 	public:
-		Histogram(int min, int max, int n_bins, std::string input);
+		Histogram(int min, int max, int n_bins, std::stringstream &input, int mode);
 		~Histogram();
 
 		void printHistogramByValue();
@@ -24,6 +33,6 @@ class Histogram {
 		int getBin(int number);
 
 		std::vector<std::pair<int,int>> vec;
-		int min, max, n_bins;
-		bin bins[200000];
+		int min, max, n_bins, mode;
+		bin bins[20000];
 };
