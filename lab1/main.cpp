@@ -19,7 +19,7 @@ std::stringstream readFileStream(std::string filename) {
 
 int main(int argc, char* argv[]) {
 
-	std::string usage = "Usage: ./out <input file> <number of bins> <mode>\n\n"
+	std::string usage = "Usage: ./Histogram <input file> <number of bins> <mode>\n\n"
 						"\t<input file>\n"
 						"\t<number of bins>\t:  0 for no bins\n"				
 						"\t<mode>\t\t:  '-n' for numerical input; '-a' for alpha input\n";
