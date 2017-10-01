@@ -11,5 +11,6 @@ std::stringstream readFileStream(std::string filename) {
 
 int main(int argc, char* argv[]) {
 	std::stringstream input = readFileStream(argv[1]);
-	FCM(1, input.str());
+	FCM testing = FCM(3, input.str());
+	std::cout << "Next will be: " << testing.guessNext() << std::endl;
 }
