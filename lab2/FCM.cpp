@@ -1,8 +1,8 @@
 #include "FCM.h"
 
 FCM::FCM(int order, std::string input) : order(order){
-	std::string innerkey;
-	std::string to_add;
+	std::string symbol;
+	std::string context;
 	//Strip all symbols but letters and spaces
 	input.erase(std::remove_if(input.begin(), input.end(), 
 		[](char c) { 
@@ -11,9 +11,9 @@ FCM::FCM(int order, std::string input) : order(order){
 	len = input.length();
 	for(unsigned int i = order; i < len; i++) 
 	{
-		to_add = input.substr(i-order, order);
-		innerkey = std::string(1, input[i]);
-		map[to_add][innerkey]++;
+		context = input.substr(i-order, order);
+		symbol = std::string(1, input[i]);
+		map[context][symbol]++;
 	}
 	current_context = input.substr(len-order, order);
 	data = input;
