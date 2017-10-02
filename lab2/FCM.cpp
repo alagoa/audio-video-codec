@@ -9,17 +9,11 @@ FCM::FCM(int order, std::string input) : order(order){
 			return !isalpha(c) && c!=0x20; 
 		}), input.end());
 	len = input.length();
-	for(unsigned int i = order; i < len; i++) {
+	for(unsigned int i = order; i < len; i++) 
+	{
 		to_add = input.substr(i-order, order);
 		innerkey = std::string(1, input[i]);
-		if (map.count(to_add)){
-			if ( map[to_add].count(innerkey) )
-				map[to_add][innerkey]++;
-			else
-				map[to_add][innerkey] = 1;
-		}
-		else
-			map[to_add] = InnerCounter( {{innerkey, 1}} );
+		map[to_add][innerkey]++;
 	}
 	current_context = input.substr(len-order, order);
 	data = input;
@@ -40,7 +34,8 @@ std::string FCM::guessNext(){
 	InnerCounter* inner_map = &map[current_context];
 	std::string best_guess;
 	unsigned int max = 0;
-	for (auto it = inner_map->begin(); it != inner_map->end(); ++it){
+	for (auto it = inner_map->begin(); it != inner_map->end(); ++it)
+	{
 		if (it->second > max)
 		{
 			max = it->second;
@@ -64,7 +59,7 @@ double FCM::getEntropy(){
 	for (unsigned int i = order; i < len; ++i)
 	{
 		c_contx = data.substr(i-order,order);
-		sum += std::log(probOfSymbol(c_contx, data.substr(i, 1)));
+		sum += std::log(probOfSymbol(c_contx, std::string(1, data[i])));
 	}
 	return -(1.0/(double)len)*sum;
 
@@ -77,7 +72,7 @@ double FCM::probOfSymbol(std::string contx, std::string symbol){
 	if ( !map.count(contx) )
 		return 0;
 	inner_map = &map[contx];
-	if (!inner_map->count(symbol))
+	if ( !inner_map->count(symbol) )
 		return 0;
 	sum = 0;
 	symbol_val = inner_map->at(symbol);
