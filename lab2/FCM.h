@@ -1,9 +1,8 @@
 #include <unordered_map>
 #include <string> 
-#include <sstream>
 #include <algorithm>
 #include <iostream>
-#include <fstream>
+#include <cmath>
 
 typedef std::unordered_map<std::string, unsigned int> InnerCounter;
 
@@ -14,12 +13,16 @@ class FCM {
 
 		void addChar(char c);
 		void printContextInfo(std::string contx);
-		void getEntropy();
+		double getEntropy();
 		std::string guessNext();
+		double probOfSymbol(std::string contx, std::string symbol);
 		void saveModel();
 		void readModel();
 		void printModelInfo();
 	private:
 		std::unordered_map<std::string, InnerCounter> map;
 		std::string current_context;
+		std::string data;
+		int order;
+		unsigned int len;
 };
