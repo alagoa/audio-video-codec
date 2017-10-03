@@ -12,8 +12,14 @@ std::stringstream readFileStream(std::string filename) {
 }
 
 int main(int argc, char* argv[]) {
+	std::string __;
 	std::stringstream input = readFileStream(argv[1]);
-	FCM testing = FCM(2, input.str());
-	std::cout << "Next will be: " << testing.guessNext() << "\n";
-	std::cout << "Entropy: " << testing.getEntropy() << std::endl;
+	FCM testing = FCM(4, input.str());
+	//std::cout << "Next will be: " << testing.guessNext() << "\n";
+	std::cerr << "Entropy: " << testing.getEntropy() << "\n";
+	while(1){
+		//std::cin >> __;
+		//testing.printContextInfo();
+		std::cout << testing.guessNext();
+	}
 }

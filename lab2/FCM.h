@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <iostream>
 #include <cmath>
+#include <random>
+#include <vector>
+#include <ctime>
 
 typedef std::unordered_map<std::string, unsigned int> InnerCounter;
 
@@ -13,6 +16,7 @@ class FCM {
 
 		void addChar(char c);
 		void printContextInfo(std::string contx);
+		void printContextInfo();
 		double getEntropy();
 		std::string guessNext();
 		double probOfSymbol(std::string contx, std::string symbol);

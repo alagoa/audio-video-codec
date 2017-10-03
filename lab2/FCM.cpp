@@ -33,15 +33,32 @@ void FCM::printModelInfo(){
 std::string FCM::guessNext(){
 	InnerCounter* inner_map = &map[current_context];
 	std::string best_guess;
-	unsigned int max = 0;
+	std::vector<unsigned int> weights;
+	std::vector<std::string> symbols;
+	//std::default_random_engine generator;
+	std::mt19937 gen(std::time(0));
+	std::discrete_distribution<int> dist;
+	//unsigned int max = 0;
 	for (auto it = inner_map->begin(); it != inner_map->end(); ++it)
 	{
+		weights.push_back(it->second);
+		symbols.push_back(it->first);
+		/*
 		if (it->second > max)
 		{
 			max = it->second;
 			best_guess = it->first;
 		}
+		*/
 	}
+	dist = std::discrete_distribution<int>(weights.begin(), weights.end());
+	best_guess = symbols[dist(gen)];
+	
+	//data += best_guess;
+	current_context = current_context.substr(1,order-1);
+	current_context += best_guess;
+	map[current_context][best_guess]++;
+	
 	return best_guess;
 }
 
@@ -51,6 +68,13 @@ void FCM::printContextInfo(std::string contx){
 	InnerCounter* inner_map = &map[contx];
 	for (InnerCounter::iterator it = inner_map->begin(); it != inner_map->end(); ++it)
 		std::cout << "[" << contx << "][" << it->first << "] = " << it->second << "\n";
+}
+void FCM::printContextInfo(){
+	if (!map.count(current_context))
+		return;
+	InnerCounter* inner_map = &map[current_context];
+	for (InnerCounter::iterator it = inner_map->begin(); it != inner_map->end(); ++it)
+		std::cout << "[" << current_context << "][" << it->first << "] = " << it->second << "\n";
 }
 
 double FCM::getEntropy(){
