@@ -6,7 +6,7 @@ FCM::FCM(int order, std::string input) : order(order){
 	//Strip all symbols but letters and spaces
 	input.erase(std::remove_if(input.begin(), input.end(), 
 		[](char c) { 
-			return !isalpha(c) && c!=0x20; 
+			return !isalpha(c) && c!=0x20 && c!='\n'; 
 		}), input.end());
 	len = input.length();
 	for(unsigned int i = order; i < len; i++) 
@@ -35,21 +35,13 @@ std::string FCM::guessNext(){
 	std::string best_guess;
 	std::vector<unsigned int> weights;
 	std::vector<std::string> symbols;
-	//std::default_random_engine generator;
 	std::mt19937 gen(std::time(0));
 	std::discrete_distribution<int> dist;
-	//unsigned int max = 0;
+
 	for (auto it = inner_map->begin(); it != inner_map->end(); ++it)
 	{
 		weights.push_back(it->second);
 		symbols.push_back(it->first);
-		/*
-		if (it->second > max)
-		{
-			max = it->second;
-			best_guess = it->first;
-		}
-		*/
 	}
 	dist = std::discrete_distribution<int>(weights.begin(), weights.end());
 	best_guess = symbols[dist(gen)];
@@ -57,8 +49,7 @@ std::string FCM::guessNext(){
 	//data += best_guess;
 	current_context = current_context.substr(1,order-1);
 	current_context += best_guess;
-	map[current_context][best_guess]++;
-	
+	//map[current_context][best_guess]++;
 	return best_guess;
 }
 
