@@ -50,6 +50,7 @@ int main(int argc, char* argv[]) {
 	std::cerr << "Init in: " << elapsed_seconds.count() << "s\n";
 	//std::cerr << "Entropy: " << testing.getEntropy() << "\n";
 	start = std::chrono::system_clock::now();
+	//testing.printModelInfo(); 
 	while(1){
 		#ifdef DEBUG
 			std::cin >> __;
@@ -57,6 +58,8 @@ int main(int argc, char* argv[]) {
 		#endif /* DEBUG */
 		std::cout << testing.guessNext();
 		l++;
-		std::cerr << '\r' << l;
+		#ifndef DEBUG
+			std::cerr << '\r' << l;
+		#endif /* not def DEGUG */
 	}
 }

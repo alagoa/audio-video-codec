@@ -5,12 +5,12 @@ FCM::FCM(int order, std::string input) : order(order){
 	std::string context;
 	for(unsigned int count = 'A'; count <= 'Z'; count++) {
 		symbols_list[std::string(1, count)] = 1;
+		symbols_list[std::string(1, count + 32)] = 1; //A->a just add 32
 	}
-	for(unsigned int count = 'a'; count <= 'z'; count++) {
-		symbols_list[std::string(1, count)] = 1;
-	}
+	//for(unsigned int count = 'a'; count <= 'z'; count++) {
+	//	symbols_list[std::string(1, count)] = 1;
+	//}
 	symbols_list[" "] = 1; symbols_list["\n"] = 1;
-
 
 	//Strip all symbols but letters and spaces
 	input.erase(std::remove_if(input.begin(), input.end(), 
@@ -18,18 +18,22 @@ FCM::FCM(int order, std::string input) : order(order){
 			return !isalpha(c) && c!=0x20 && c!='\n'; 
 		}), input.end());
 	len = input.length();
-	for(unsigned int i = order; i < len; i++) 
+
+	context = input.substr(0, order);
+	symbol = std::string(1, input[order]);
+	for(unsigned int i = order; i < len-1; i++) 
 	{
-		context = input.substr(i-order, order);
-		symbol = std::string(1, input[i]);
 		#ifdef WITH_ALPHA
 		if (map.count(context) <= 0)
 			map.emplace(context, symbols_list);
 		#endif /* WITH_ALPHA */
 		map[context][symbol]++;
+		context.erase(0, 1) += symbol;
+		symbol = std::string(1, input[i+1]);
 	}
-	current_context = input.substr(len-order, order);
+	current_context = context.erase(0, 1) + symbol;//input.substr(len-order, order);
 	data = input;
+	gen= std::mt19937(std::time(0));
 }
 
 FCM::~FCM() {
@@ -48,8 +52,8 @@ std::string FCM::guessNext(){
 	std::string best_guess;
 	std::vector<unsigned int> weights;
 	std::vector<std::string> symbols;
-	static std::mt19937 gen(std::time(0));
-	std::discrete_distribution<int> dist;
+	//static std::mt19937 gen(std::time(0));
+	std::discrete_distribution<unsigned int> dist;
 	//check if inner_map is empty or you get a segfault
 	if (inner_map->empty())
 		inner_map = &symbols_list;
@@ -59,12 +63,11 @@ std::string FCM::guessNext(){
 		weights.push_back(it->second);
 		symbols.push_back(it->first);
 	}
-	dist = std::discrete_distribution<int>(weights.begin(), weights.end());
+	dist = std::discrete_distribution<unsigned int>(weights.begin(), weights.end());
 	best_guess = symbols[dist(gen)];
 	
 	//data += best_guess;
-	current_context = current_context.substr(1,order-1);
-	current_context += best_guess;
+	current_context.erase(0,1) += best_guess;
 	//map[current_context][best_guess]++;
 	return best_guess;
 }
