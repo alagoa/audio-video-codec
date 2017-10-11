@@ -3,6 +3,15 @@
 FCM::FCM(int order, std::string input) : order(order){
 	std::string symbol;
 	std::string context;
+	for(unsigned int count = 'A'; count <= 'Z'; count++) {
+		symbols_list[std::string(1, count)] = 1;
+	}
+	for(unsigned int count = 'a'; count <= 'z'; count++) {
+		symbols_list[std::string(1, count)] = 1;
+	}
+	symbols_list[" "] = 1; symbols_list["\n"] = 1;
+
+
 	//Strip all symbols but letters and spaces
 	input.erase(std::remove_if(input.begin(), input.end(), 
 		[](char c) { 
@@ -13,6 +22,10 @@ FCM::FCM(int order, std::string input) : order(order){
 	{
 		context = input.substr(i-order, order);
 		symbol = std::string(1, input[i]);
+		#ifdef WITH_ALPHA
+		if (map.count(context) <= 0)
+			map.emplace(context, symbols_list);
+		#endif /* WITH_ALPHA */
 		map[context][symbol]++;
 	}
 	current_context = input.substr(len-order, order);
@@ -35,8 +48,11 @@ std::string FCM::guessNext(){
 	std::string best_guess;
 	std::vector<unsigned int> weights;
 	std::vector<std::string> symbols;
-	std::mt19937 gen(std::time(0));
+	static std::mt19937 gen(std::time(0));
 	std::discrete_distribution<int> dist;
+	//check if inner_map is empty or you get a segfault
+	if (inner_map->empty())
+		inner_map = &symbols_list;
 
 	for (auto it = inner_map->begin(); it != inner_map->end(); ++it)
 	{
@@ -61,7 +77,7 @@ void FCM::printContextInfo(std::string contx){
 		std::cout << "[" << contx << "][" << it->first << "] = " << it->second << "\n";
 }
 void FCM::printContextInfo(){
-	if (!map.count(current_context))
+	if (map.count(current_context) <= 0)
 		return;
 	InnerCounter* inner_map = &map[current_context];
 	for (InnerCounter::iterator it = inner_map->begin(); it != inner_map->end(); ++it)

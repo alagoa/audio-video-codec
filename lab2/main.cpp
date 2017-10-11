@@ -1,6 +1,12 @@
 #include "FCM.h"
 #include <sstream>
 #include <fstream>
+#include <chrono>
+#include <csignal>
+
+std::chrono::time_point<std::chrono::system_clock> start;
+std::chrono::time_point<std::chrono::system_clock> end;
+volatile unsigned long l = 0;
 
 std::stringstream readFileStream(std::string filename) {
 	std::ifstream finput;
@@ -11,10 +17,23 @@ std::stringstream readFileStream(std::string filename) {
 	return input;
 }
 
+void signal_handler(int signal)
+{
+	end = std::chrono::system_clock::now();
+	std::chrono::duration<double> elapsed_seconds;
+	elapsed_seconds = end-start;
+	double words_per_sec = ((double)l)/elapsed_seconds.count();
+	std::cerr << "\nSymbols per sec: " << words_per_sec << "\n";
+	std::exit(0);
+}
+
 int main(int argc, char* argv[]) {
-	unsigned long l = 0;
+	std::signal(SIGINT, signal_handler);
 	int order;
-	std::string __;
+	std::chrono::duration<double> elapsed_seconds;
+	#ifdef DEBUG
+		std::string __;
+	#endif /* DEBUG */
 	std::stringstream input;
 	std::string usage = "Usage: ./FCM <input file> <order>\n";
 	
@@ -24,12 +43,18 @@ int main(int argc, char* argv[]) {
 	}
 	order = std::stoi(argv[2]);
 	input = readFileStream(argv[1]);
+	start = std::chrono::system_clock::now();
 	FCM testing = FCM(order, input.str());
-	//std::cout << "Next will be: " << testing.guessNext() << "\n";
-	std::cerr << "Entropy: " << testing.getEntropy() << "\n";
+	end = std::chrono::system_clock::now();
+	elapsed_seconds = end-start;
+	std::cerr << "Init in: " << elapsed_seconds.count() << "s\n";
+	//std::cerr << "Entropy: " << testing.getEntropy() << "\n";
+	start = std::chrono::system_clock::now();
 	while(1){
-		//std::cin >> __;
-		//testing.printContextInfo();
+		#ifdef DEBUG
+			std::cin >> __;
+			testing.printContextInfo();
+		#endif /* DEBUG */
 		std::cout << testing.guessNext();
 		l++;
 		std::cerr << '\r' << l;

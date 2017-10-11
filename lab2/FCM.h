@@ -6,6 +6,7 @@
 #include <random>
 #include <vector>
 #include <ctime>
+#define WITH_ALPHA
 
 typedef std::unordered_map<std::string, unsigned int> InnerCounter;
 
@@ -25,6 +26,7 @@ class FCM {
 		void printModelInfo();
 	private:
 		std::unordered_map<std::string, InnerCounter> map;
+		InnerCounter symbols_list;
 		std::string current_context;
 		std::string data;
 		int order;
