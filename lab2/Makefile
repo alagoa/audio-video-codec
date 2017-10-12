@@ -1,6 +1,7 @@
 P=FCM
 OBJECTS= FCM.o main.o
 DEBUG_OBJ= FCM_debug.o main_debug.o
+BOOSTFLAGS=-lboost_serialization
 CFLAGS = -Wall -O3
 CFLAGS_DEBUG = -Wall -g
 LDLIBS=
@@ -9,7 +10,7 @@ CC=g++
 all: $(P)
 # Generate application
 $(P): $(OBJECTS)
-	$(CC) $(CFLAGS) -o $(P) $(OBJECTS)
+	$(CC) $(CFLAGS) -o $(P) $(BOOSTFLAGS) $(OBJECTS)
 # Generate object files
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c $< -o$@
