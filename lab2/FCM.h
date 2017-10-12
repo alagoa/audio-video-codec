@@ -6,6 +6,7 @@
 #include <random>
 #include <vector>
 #include <ctime>
+#include <boost/serialization/unordered_map.hpp>
 //#define WITH_ALPHA
 
 typedef std::unordered_map<std::string, unsigned int> InnerCounter;
@@ -13,6 +14,7 @@ typedef std::unordered_map<std::string, unsigned int> InnerCounter;
 class FCM {
 	public:
 		FCM(int order, std::string input);
+		FCM();
 		~FCM();
 
 		void addChar(char c);
@@ -21,10 +23,20 @@ class FCM {
 		double getEntropy();
 		std::string guessNext();
 		double probOfSymbol(std::string contx, std::string symbol);
-		void saveModel();
-		void readModel();
 		void printModelInfo();
+		void genRandom();
 	private:
+		friend class boost::serialization::access;
+		template <typename Archive>
+  		void serialize(Archive &ar, const unsigned int version) { 
+  			ar & map;
+  			ar & symbols_list;
+  			ar & order;
+  			ar & current_context;
+  			ar & data;
+  			ar & len;
+  		}
+
 		std::unordered_map<std::string, InnerCounter> map;
 		InnerCounter symbols_list;
 		std::string current_context;

@@ -3,13 +3,35 @@
 #include <fstream>
 #include <chrono>
 #include <csignal>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+
+using namespace boost::archive;
 
 std::chrono::time_point<std::chrono::system_clock> start;
 std::chrono::time_point<std::chrono::system_clock> end;
 volatile unsigned long l = 0;
 
+void saveModel(FCM fcm) {
+	std::ofstream fout("fcm.bin");
+	{
+		text_oarchive oa{fout};
+		oa << fcm;
+	}
+}
+
+void loadModel(FCM &fcm) {
+	std::ifstream fin("fcm.bin");
+	{
+		text_iarchive ia{fin};
+		ia >> fcm;
+	}
+	
+	fcm.genRandom();
+}
+
 std::stringstream readFileStream(std::string filename) {
-	std::ifstream finput;
+	std::ifstream  finput;
 	std::stringstream input;
 	finput.open(filename);
 	input << finput.rdbuf();
@@ -48,18 +70,18 @@ int main(int argc, char* argv[]) {
 	end = std::chrono::system_clock::now();
 	elapsed_seconds = end-start;
 	std::cerr << "Init in: " << elapsed_seconds.count() << "s\n";
+	saveModel(testing);
+	FCM good;
+	loadModel(good);
 	//std::cerr << "Entropy: " << testing.getEntropy() << "\n";
 	start = std::chrono::system_clock::now();
-	//testing.printModelInfo(); 
-	while(1){
+	while(l<10000){
 		#ifdef DEBUG
 			std::cin >> __;
-			testing.printContextInfo();
+			good.printContextInfo();
 		#endif /* DEBUG */
-		std::cout << testing.guessNext();
+		std::cout << good.guessNext();
 		l++;
-		#ifndef DEBUG
-			std::cerr << '\r' << l;
-		#endif /* not def DEGUG */
+		//std::cerr << '\r' << l;
 	}
 }

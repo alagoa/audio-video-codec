@@ -1,16 +1,20 @@
 #include "FCM.h"
 
+FCM::FCM() {
+
+}
+
 FCM::FCM(int order, std::string input) : order(order){
 	std::string symbol;
 	std::string context;
 	for(unsigned int count = 'A'; count <= 'Z'; count++) {
-		symbols_list[std::string(1, count)] = 1;
-		symbols_list[std::string(1, count + 32)] = 1; //A->a just add 32
+		symbols_list[std::string(1, count)] = 0;
+		symbols_list[std::string(1, count + 32)] = 0; //A->a just add 32
 	}
 	//for(unsigned int count = 'a'; count <= 'z'; count++) {
 	//	symbols_list[std::string(1, count)] = 1;
 	//}
-	symbols_list[" "] = 1; symbols_list["\n"] = 1;
+	symbols_list[" "] = 0; symbols_list["\n"] = 0;
 
 	//Strip all symbols but letters and spaces
 	input.erase(std::remove_if(input.begin(), input.end(), 
@@ -20,6 +24,7 @@ FCM::FCM(int order, std::string input) : order(order){
 	len = input.length();
 
 	context = input.substr(0, order);
+	//std::cout << context << "\n";
 	symbol = std::string(1, input[order]);
 	for(unsigned int i = order; i < len-1; i++) 
 	{
@@ -31,13 +36,20 @@ FCM::FCM(int order, std::string input) : order(order){
 		context.erase(0, 1) += symbol;
 		symbol = std::string(1, input[i+1]);
 	}
-	current_context = context.erase(0, 1) + symbol;//input.substr(len-order, order);
+	current_context = context.erase(0, 1) + symbol;
+
+	//current_context = input.substr(len-order, order);
+	std::cout << current_context;
 	data = input;
-	gen= std::mt19937(std::time(0));
+	genRandom();
 }
 
 FCM::~FCM() {
 
+}
+
+void FCM::genRandom() {
+	gen = std::mt19937(std::time(0));
 }
 
 void FCM::printModelInfo(){
@@ -48,9 +60,10 @@ void FCM::printModelInfo(){
 }
 
 std::string FCM::guessNext(){
+	float alpha = 0.1;
 	InnerCounter* inner_map = &map[current_context];
 	std::string best_guess;
-	std::vector<unsigned int> weights;
+	std::vector<float> weights;
 	std::vector<std::string> symbols;
 	//static std::mt19937 gen(std::time(0));
 	std::discrete_distribution<unsigned int> dist;
@@ -60,7 +73,7 @@ std::string FCM::guessNext(){
 
 	for (auto it = inner_map->begin(); it != inner_map->end(); ++it)
 	{
-		weights.push_back(it->second);
+		weights.push_back(it->second+alpha);
 		symbols.push_back(it->first);
 	}
 	dist = std::discrete_distribution<unsigned int>(weights.begin(), weights.end());
@@ -96,7 +109,6 @@ double FCM::getEntropy(){
 		sum += std::log(probOfSymbol(c_contx, std::string(1, data[i])));
 	}
 	return -(1.0/(double)len)*sum;
-
 }
 
 double FCM::probOfSymbol(std::string contx, std::string symbol){
