@@ -7,13 +7,15 @@ FCM::FCM() {
 FCM::FCM(int order, std::string input) : order(order){
 	std::string symbol;
 	std::string context;
+
 	for(unsigned int count = 'A'; count <= 'Z'; count++) {
-		symbols_list[std::string(1, count)] = 0;
-		symbols_list[std::string(1, count + 32)] = 0; //A->a just add 32
+		if(input.find(count) != std::string::npos) {
+			symbols_list[std::string(1, count)] = 0;
+		}
+		if(input.find(count+32) != std::string::npos) {
+			symbols_list[std::string(1, count + 32)] = 0; //A->a just add 32
+		}
 	}
-	//for(unsigned int count = 'a'; count <= 'z'; count++) {
-	//	symbols_list[std::string(1, count)] = 1;
-	//}
 	symbols_list[" "] = 0; symbols_list["\n"] = 0;
 
 	//Strip all symbols but letters and spaces
@@ -24,7 +26,7 @@ FCM::FCM(int order, std::string input) : order(order){
 	len = input.length();
 
 	context = input.substr(0, order);
-	//std::cout << context << "\n";
+	
 	symbol = std::string(1, input[order]);
 	for(unsigned int i = order; i < len-1; i++) 
 	{
@@ -37,9 +39,6 @@ FCM::FCM(int order, std::string input) : order(order){
 		symbol = std::string(1, input[i+1]);
 	}
 	current_context = context.erase(0, 1) + symbol;
-
-	//current_context = input.substr(len-order, order);
-	std::cout << current_context;
 	data = input;
 	genRandom();
 }
@@ -65,8 +64,8 @@ std::string FCM::guessNext(){
 	std::string best_guess;
 	std::vector<float> weights;
 	std::vector<std::string> symbols;
-	//static std::mt19937 gen(std::time(0));
 	std::discrete_distribution<unsigned int> dist;
+
 	//check if inner_map is empty or you get a segfault
 	if (inner_map->empty())
 		inner_map = &symbols_list;
@@ -79,7 +78,6 @@ std::string FCM::guessNext(){
 	dist = std::discrete_distribution<unsigned int>(weights.begin(), weights.end());
 	best_guess = symbols[dist(gen)];
 	
-	//data += best_guess;
 	current_context.erase(0,1) += best_guess;
 	//map[current_context][best_guess]++;
 	return best_guess;

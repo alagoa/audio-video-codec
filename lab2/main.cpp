@@ -66,21 +66,22 @@ int main(int argc, char* argv[]) {
 	order = std::stoi(argv[2]);
 	input = readFileStream(argv[1]);
 	start = std::chrono::system_clock::now();
-	FCM testing = FCM(order, input.str());
+	FCM toSave = FCM(order, input.str());
 	end = std::chrono::system_clock::now();
 	elapsed_seconds = end-start;
 	std::cerr << "Init in: " << elapsed_seconds.count() << "s\n";
-	saveModel(testing);
-	FCM good;
-	loadModel(good);
-	//std::cerr << "Entropy: " << testing.getEntropy() << "\n";
+	saveModel(toSave);
+	FCM loadedModel;
+	loadModel(loadedModel);
+	//std::cerr << "Entropy: " << toSave.getEntropy() << "\n";
 	start = std::chrono::system_clock::now();
-	while(l<10000){
+	std::cerr << "Entropy: " << loadedModel.getEntropy();
+	while(l<1000){
 		#ifdef DEBUG
 			std::cin >> __;
-			good.printContextInfo();
+			loadedModel.printContextInfo();
 		#endif /* DEBUG */
-		std::cout << good.guessNext();
+		std::cout << loadedModel.guessNext();
 		l++;
 		//std::cerr << '\r' << l;
 	}
