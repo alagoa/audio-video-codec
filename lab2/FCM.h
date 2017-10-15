@@ -17,7 +17,7 @@ class FCM {
 		FCM();
 		~FCM();
 
-		void addChar(char c);
+		void addSymbol(std::string symbol);
 		void printContextInfo(std::string contx);
 		void printContextInfo();
 		double getEntropy();
