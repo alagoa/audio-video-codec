@@ -26,7 +26,6 @@ void saveModel(FCM fcm, std::string fname) {
 void loadModel(FCM &fcm, std::string fname) {
 	std::ifstream fin(fname);
 	{
-		std::cout << "trying to load model";
 		text_iarchive ia{fin};
 		ia >> fcm;
 	}
@@ -132,7 +131,6 @@ int main(int argc, char* argv[]) {
 	// Load model from file if requested.... 
 	FCM fcm;
 	if(!load_file.empty()) {
-		std::cout << "loading from file";
 		start = std::chrono::system_clock::now();
 		loadModel(fcm, load_file);
 		end = std::chrono::system_clock::now();
