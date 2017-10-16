@@ -45,5 +45,5 @@ class FCM {
 		int order;
 		unsigned int len;
 		std::mt19937 gen;
-		const double alpha = 0.1;
+		double alpha = 0.1;
 };
