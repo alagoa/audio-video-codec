@@ -53,7 +53,7 @@ void signal_handler(int signal)
 	std::exit(0);
 }
 
-int handleArgs(int argc, char* argv[], std::string &input, int &order, std::string &output, int &output_length, std::string &save_file, std::string &load_file) {
+int handleArgs(int argc, char* argv[], std::string &input, int &order, std::string &output, int &output_length, std::string &save_file, std::string &load_file, double &alpha) {
 	po::options_description desc("Allowed options");
 	desc.add_options()
 	    ("help,h", 																		"produce help message")
@@ -63,6 +63,7 @@ int handleArgs(int argc, char* argv[], std::string &input, int &order, std::stri
 	    ("output_length,l", po::value<int>(&output_length)->default_value(1000),		"length of the output file (in chars)")
 	    ("save,s", po::value<std::string>(&save_file),									"file where the model will be saved")
 	    ("read,r", po::value<std::string>(&load_file),									"file with the model to be read")
+	    ("alpha,a", po::value<double>(&alpha)->default_value(0.1),						"alpha value")
 	;
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -97,6 +98,11 @@ int handleArgs(int argc, char* argv[], std::string &input, int &order, std::stri
 		return 0;
 	}
 
+	if(vm["alpha"].as<double>() < 0) {
+		std::cout << "Alpha needs to be a positive number.\n" << desc << "\n";
+		return 0;
+	}
+
 
 
 	return 1;
@@ -108,12 +114,13 @@ int main(int argc, char* argv[]) {
 	int order;
 	int output_length;
 	int counter = 0;
+	double alpha;
 	std::string input_file;
 	std::string output_file;
 	std::string save_file;
 	std::string load_file;
 	std::chrono::duration<double> elapsed_seconds;
-	if(!handleArgs(argc, argv, input_file, order, output_file, output_length, save_file, load_file))
+	if(!handleArgs(argc, argv, input_file, order, output_file, output_length, save_file, load_file, alpha))
 		return 0;
 
 	std::signal(SIGINT, signal_handler);
@@ -136,7 +143,7 @@ int main(int argc, char* argv[]) {
 	else {
 		std::stringstream input = readFileStream(input_file);
 		start = std::chrono::system_clock::now();
-		fcm = FCM(order, input.str());
+		fcm = FCM(order, input.str(), alpha);
 		end = std::chrono::system_clock::now();
 		elapsed_seconds = end-start;
 		std::cerr << "Model created in: " << elapsed_seconds.count() << "s\n";

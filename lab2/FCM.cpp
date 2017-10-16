@@ -4,7 +4,7 @@ FCM::FCM() {
 
 }
 
-FCM::FCM(int order, std::string input) : order(order){
+FCM::FCM(int order, std::string input, double alpha) : order(order){
 	std::string symbol;
 	std::string context;
 
@@ -40,6 +40,7 @@ FCM::FCM(int order, std::string input) : order(order){
 	}
 	current_context = context.erase(0, 1) + symbol;
 	data = input;
+	this->alpha = alpha;
 	genRandom();
 }
 
@@ -100,16 +101,16 @@ void FCM::printContextInfo(){
 double FCM::getEntropy(){
 	double sum = 0;
 	std::string c_contx;
-	double total = 0;
+	double total_contex_ap = 0;
 	double contx_ap = 0;
 	for (unsigned int i = order; i < len; ++i)
 	{
 		c_contx = data.substr(i-order,order);
 		sum += std::log2(probOfSymbol(c_contx, std::string(1, data[i]), &contx_ap));
-		total += contx_ap;
+		total_contex_ap += contx_ap;
 	}
 	double no = (std::pow(symbols_list.size(), order)) - map.size();
-	return (-(1.0/(double)len) * sum) + ((no*alpha) / (total + std::pow(symbols_list.size(), order) * alpha)) * (std::pow(symbols_list.size(), order));
+	return (-(1.0/(double)len) * sum) + ((no*alpha) / (total_contex_ap + std::pow(symbols_list.size(), order) * alpha)) * (std::pow(symbols_list.size(), order));
 }
 
 double FCM::probOfSymbol(std::string contx, std::string symbol, double* num_ap){

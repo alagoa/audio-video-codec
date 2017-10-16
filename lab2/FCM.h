@@ -13,7 +13,7 @@ typedef std::unordered_map<std::string, unsigned int> InnerCounter;
 
 class FCM {
 	public:
-		FCM(int order, std::string input);
+		FCM(int order, std::string input, double alpha);
 		FCM();
 		~FCM();
 
@@ -45,5 +45,5 @@ class FCM {
 		int order;
 		unsigned int len;
 		std::mt19937 gen;
-		double alpha = 0.1;
+		double alpha;
 };
