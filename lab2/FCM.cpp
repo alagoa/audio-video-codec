@@ -101,14 +101,10 @@ void FCM::printContextInfo(){
 double FCM::getEntropy(){
 	double sum = 0;
 	std::string c_contx;
-	int probi;
 	for (unsigned int i = order; i < len; ++i)
 	{
 		c_contx = data.substr(i-order,order);
-		probi = probOfSymbol(c_contx, std::string(1, data[i])); 
-		if(probi > 0) {
-			sum += std::log2(probi);
-		}
+		sum += std::log(probOfSymbol(c_contx, std::string(1, data[i])));
 	}
 	return -(1.0/(double)len)*sum;
 }
