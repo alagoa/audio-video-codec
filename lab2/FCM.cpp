@@ -108,7 +108,8 @@ double FCM::getEntropy(){
 		sum += std::log2(probOfSymbol(c_contx, std::string(1, data[i]), &contx_ap));
 		total += contx_ap;
 	}
-	return (-(1.0/(double)len) * sum) + ((std::pow(symbols_list.size(), order) - map.size()) + alpha) / (total + std::pow(symbols_list.size(), order) * alpha);
+	double no = (std::pow(symbols_list.size(), order)) - map.size();
+	return (-(1.0/(double)len) * sum) + ((no*alpha) / (total + std::pow(symbols_list.size(), order) * alpha)) * (std::pow(symbols_list.size(), order));
 }
 
 double FCM::probOfSymbol(std::string contx, std::string symbol, double* num_ap){
@@ -123,7 +124,7 @@ double FCM::probOfSymbol(std::string contx, std::string symbol, double* num_ap){
 	sum = 0;
 	symbol_val = inner_map->at(symbol);
 	for (InnerCounter::iterator it = inner_map->begin(); it != inner_map->end(); ++it)
-		sum += it->second + alpha;
-	*num_ap = sum;
+		sum += it->second;
+	*num_ap = sum+ alpha;
 	return symbol_val/sum;
 }
