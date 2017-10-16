@@ -106,7 +106,7 @@ double FCM::getEntropy(){
 	{
 		c_contx = data.substr(i-order,order);
 		probi = probOfSymbol(c_contx, std::string(1, data[i])); 
-		if(probi <= 0) {
+		if(probi > 0) {
 			sum += std::log2(probi);
 		}
 	}
