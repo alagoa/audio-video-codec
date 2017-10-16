@@ -59,7 +59,6 @@ void FCM::printModelInfo(){
 }
 
 std::string FCM::guessNext(){
-	float alpha = 0.1;
 	InnerCounter* inner_map = &map[current_context];
 	std::string best_guess;
 	std::vector<float> weights;
@@ -101,15 +100,18 @@ void FCM::printContextInfo(){
 double FCM::getEntropy(){
 	double sum = 0;
 	std::string c_contx;
+	double total = 0;
+	double contx_ap = 0;
 	for (unsigned int i = order; i < len; ++i)
 	{
 		c_contx = data.substr(i-order,order);
-		sum += std::log(probOfSymbol(c_contx, std::string(1, data[i])));
+		sum += std::log2(probOfSymbol(c_contx, std::string(1, data[i]), &contx_ap));
+		total += contx_ap;
 	}
-	return -(1.0/(double)len)*sum;
+	return (-(1.0/(double)len) * sum) + ((std::pow(symbols_list.size(), order) - map.size()) + alpha) / (total + std::pow(symbols_list.size(), order) * alpha);
 }
 
-double FCM::probOfSymbol(std::string contx, std::string symbol){
+double FCM::probOfSymbol(std::string contx, std::string symbol, double* num_ap){
 	double symbol_val;
 	double sum;
 	InnerCounter* inner_map;
@@ -121,6 +123,7 @@ double FCM::probOfSymbol(std::string contx, std::string symbol){
 	sum = 0;
 	symbol_val = inner_map->at(symbol);
 	for (InnerCounter::iterator it = inner_map->begin(); it != inner_map->end(); ++it)
-		sum += it->second;
+		sum += it->second + alpha;
+	*num_ap = sum;
 	return symbol_val/sum;
 }

@@ -22,7 +22,7 @@ class FCM {
 		void printContextInfo();
 		double getEntropy();
 		std::string guessNext();
-		double probOfSymbol(std::string contx, std::string symbol);
+		double probOfSymbol(std::string contx, std::string symbol, double* num_ap);
 		void printModelInfo();
 		void genRandom();
 	private:
@@ -35,6 +35,7 @@ class FCM {
   			ar & current_context;
   			ar & data;
   			ar & len;
+  			ar & alpha;
   		}
 
 		std::unordered_map<std::string, InnerCounter> map;
@@ -44,4 +45,5 @@ class FCM {
 		int order;
 		unsigned int len;
 		std::mt19937 gen;
+		const double alpha = 0.1;
 };
