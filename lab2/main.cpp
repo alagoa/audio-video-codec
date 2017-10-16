@@ -26,6 +26,7 @@ void saveModel(FCM fcm, std::string fname) {
 void loadModel(FCM &fcm, std::string fname) {
 	std::ifstream fin(fname);
 	{
+		std::cout << "trying to load model";
 		text_iarchive ia{fin};
 		ia >> fcm;
 	}
@@ -59,7 +60,7 @@ int handleArgs(int argc, char* argv[], std::string &input, int &order, std::stri
 	    ("input,i", po::value<std::string>(&input),										"input file")
 	    ("order,k", po::value<int>(&order)->default_value(1),							"set order of the model")
 	    ("output,o", po::value<std::string>(&output)->default_value("out.txt"),			"output file")
-	    ("output_length,len", po::value<int>(&output_length)->default_value(1000),		"length of the output file (in chars)")
+	    ("output_length,l", po::value<int>(&output_length)->default_value(1000),		"length of the output file (in chars)")
 	    ("save,s", po::value<std::string>(&save_file),									"file where the model will be saved")
 	    ("read,r", po::value<std::string>(&load_file),									"file with the model to be read")
 	;
@@ -67,15 +68,23 @@ int handleArgs(int argc, char* argv[], std::string &input, int &order, std::stri
 	po::store(po::parse_command_line(argc, argv, desc), vm);
 	po::notify(vm);
 
-
 	if (vm.count("help") || (!vm.count("input") && !vm.count("read"))) {
 	    std::cout << desc << "\n";
 	    return 0;
 	}
 	
-	if(!boost::filesystem::exists(vm["input"].as<std::string>())) {
-		std::cout << "Input file (" << vm["input"].as<std::string>() <<") not found." << "\n";
-		return 0;
+	if(vm.count("input")) {	
+		if(!boost::filesystem::exists(vm["input"].as<std::string>())) {
+			std::cout << "Input file (" << vm["input"].as<std::string>() <<") not found." << "\n";
+			return 0;
+		}
+	}
+
+	if(vm.count("read")) {
+		if(!boost::filesystem::exists(vm["read"].as<std::string>())) {
+			std::cout << "Input file (" << vm["read"].as<std::string>() <<") not found." << "\n";
+			return 0;
+		}
 	}
 
 	if(vm["order"].as<int>() < 0) {
@@ -88,6 +97,8 @@ int handleArgs(int argc, char* argv[], std::string &input, int &order, std::stri
 		return 0;
 	}
 
+
+
 	return 1;
 }
 
@@ -98,15 +109,14 @@ int main(int argc, char* argv[]) {
 	int output_length;
 	int counter = 0;
 	std::string input_file;
-	std::string output;
+	std::string output_file;
 	std::string save_file;
 	std::string load_file;
 	std::chrono::duration<double> elapsed_seconds;
-	if(!handleArgs(argc, argv, input_file, order, output, output_length, save_file, load_file))
+	if(!handleArgs(argc, argv, input_file, order, output_file, output_length, save_file, load_file))
 		return 0;
 
 	std::signal(SIGINT, signal_handler);
-
 
 	#ifdef DEBUG
 		std::string __;
@@ -115,6 +125,7 @@ int main(int argc, char* argv[]) {
 	// Load model from file if requested.... 
 	FCM fcm;
 	if(!load_file.empty()) {
+		std::cout << "loading from file";
 		start = std::chrono::system_clock::now();
 		loadModel(fcm, load_file);
 		end = std::chrono::system_clock::now();
@@ -137,12 +148,18 @@ int main(int argc, char* argv[]) {
 	// Print entropy
 	start = std::chrono::system_clock::now();
 	std::cerr << "Entropy: " << fcm.getEntropy() << "\n";
+	std::stringstream generated_text;
 	while(counter++ <= output_length){
 		#ifdef DEBUG
 			std::cin >> __;
 			fcm.printContextInfo();
 		#endif /* DEBUG */
-		std::cout << fcm.guessNext();
+		generated_text << fcm.guessNext();
 		//std::cerr << '\r' << l;
 	}
+
+	std::ofstream fout(output_file);
+	fout << generated_text.str() << "\n";
+	fout.close();
+
 }
