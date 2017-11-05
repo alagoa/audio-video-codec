@@ -2,6 +2,6 @@
 
 int main(int argc, char const *argv[])
 {
-	AudioEntropy ae("sample05.wav");
+	AudioEntropy ae(argv[1]);
 	return 0;
 }

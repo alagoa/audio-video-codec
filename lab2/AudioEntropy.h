@@ -6,6 +6,7 @@
 #include <cstring>
 #include <map>
 #include <fstream>
+#include <algorithm>
 
 #define BUFFER_LEN 1024
 typedef std::map<int, unsigned int> counter;
@@ -20,6 +21,8 @@ public:
 	int reader(SNDFILE* sndfile, void* data_ptr, sf_count_t items, int format);
 	void save_histogram();
 private:
+	unsigned int average(counter::value_type v);
+
 	SF_INFO snd_info;
 	SNDFILE* snd_file;
 	counter* hists;
