@@ -35,6 +35,7 @@ AudioEntropy::AudioEntropy(std::string filename){
 		process_data(data, readcount, snd_info.channels);
 	}
 	print_histogram();
+	save_histogram();
 }
 
 void AudioEntropy::process_data(short *data, int count, int channels){
@@ -77,4 +78,23 @@ int AudioEntropy::reader(SNDFILE* sndfile, void* data_ptr, sf_count_t items, int
 		break;
 	}
 	return -1;
+}
+
+void AudioEntropy::save_histogram() {
+
+	for(int i = 0; i < snd_info.channels; ++i) 
+	{	
+		std::stringstream fname;
+		fname << i << "channel.txt";
+		std::cout << "saving " << fname.str() << "\n";
+		std::ofstream fout(fname.str());
+		std::stringstream out;
+
+		for (auto &e : hists[i]) {
+			out << e.first << " " << e.second << '\n';	
+		}
+		
+		fout << out.str();
+		fout.close();
+	}	
 }
