@@ -19,13 +19,13 @@ AudioEntropy::AudioEntropy(std::string filename){
 		std::cout << sf_strerror(snd_file) << "\n";
 		return;
 	}
-	hists = (counter*) malloc(sizeof(counter) * (snd_info.channels+1));						// All channels + MONO
+	hists = (counter*) malloc(sizeof(counter) * (snd_info.channels + 1));						// All channels + MONO
 	if (hists == NULL)
 	{
 		std::cout << "Error in malloc!\n";
 		return;
 	}
-	for (int i = 0; i < snd_info.channels+1; ++i)
+	for (int i = 0; i < snd_info.channels + 1; ++i)
 	{
 		hists[i] = counter();
 	}
@@ -40,9 +40,21 @@ AudioEntropy::AudioEntropy(std::string filename){
 		it->second = (it->second + (snd_info.channels - 1)) / snd_info.channels;
 	}
 
-	print_histogram();
+	//print_histogram();
 	save_histogram();
 }
+
+
+double AudioEntropy::entropy(){
+	double sum = 0;
+	double prob_A = 0;
+	for (counter::iterator it = hists[snd_info.channels].begin(); it != hists[snd_info.channels].end(); ++it)
+	{
+		prob_A = ((double)it->second / (double)snd_info.frames);
+		sum += prob_A * std::log2(prob_A);
+	}
+	return -sum;
+} 
 
 void AudioEntropy::process_data(short *data, int count, int channels){
 	int chan;
@@ -51,11 +63,9 @@ void AudioEntropy::process_data(short *data, int count, int channels){
 	for (chan = 0 ; chan < channels ; chan ++) {
 		for (k = chan ; k < count ; k+= channels) {
 			hists[chan][ data[k] ]++;	
-			hists[snd_info.channels][ data[k] ] ++;										// Add values to mono channel
+			hists[snd_info.channels][ data[k] ] ++;	// Add values to mono channel
 		}
 	}
-
-
 }
 
 
@@ -75,7 +85,6 @@ int AudioEntropy::reader(SNDFILE* sndfile, void* data_ptr, sf_count_t items, int
 	case SF_FORMAT_PCM_U8:
 	case SF_FORMAT_PCM_S8:
 	case SF_FORMAT_PCM_16:
-		std::cout << "read short\n";
 		return sf_read_short(sndfile, (short*)data_ptr, items);
 		break;
 	case SF_FORMAT_PCM_24:
@@ -93,40 +102,8 @@ int AudioEntropy::reader(SNDFILE* sndfile, void* data_ptr, sf_count_t items, int
 }
 
 void AudioEntropy::save_histogram() {
-/*
-	for(int i = 0; i < snd_info.channels; ++i) 
-	{	
-		std::stringstream fname;
-		fname << i << "channel.txt";
-		std::cout << "saving " << fname.str() << "\n";
-		std::ofstream fout(fname.str());
-		std::stringstream out;
-
-		for (auto &e : hists[i]) {
-			out << e.first << " " << e.second << '\n';	
-		}
-		
-		fout << out.str();
-		fout.close();
-	}	
-
-	std::stringstream fname;
-	fname << "mono.txt";
-	std::cout << "saving " << fname.str() << "\n";
-	std::ofstream fout(fname.str());
-	std::stringstream out;
-	for (auto &e : hists[snd_info.channels]) {
-		out << e.first << " " << e.second << '\n';	
-	}
-	
-	fout << out.str();
-	fout.close();
-
-	*/
-
 	std::ofstream fout("histogram.dat");
 	std::stringstream out;
-
 	for (auto const& x : hists[snd_info.channels]) {
 		out << x.first << " ";
 		for(int k = 0; k < snd_info.channels+1; k++) {
@@ -141,7 +118,6 @@ void AudioEntropy::save_histogram() {
 		}
 		out << "\n";
 	}
-
 	fout << out.str();
 	fout.close();
 }

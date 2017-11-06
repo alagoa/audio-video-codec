@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <sndfile.h>
+#include <cmath>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -20,9 +21,9 @@ public:
 	void print_histogram();
 	int reader(SNDFILE* sndfile, void* data_ptr, sf_count_t items, int format);
 	void save_histogram();
+	double entropy();
 private:
 	unsigned int average(counter::value_type v);
-
 	SF_INFO snd_info;
 	SNDFILE* snd_file;
 	counter* hists;
