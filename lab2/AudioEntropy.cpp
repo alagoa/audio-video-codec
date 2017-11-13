@@ -85,10 +85,12 @@ int AudioEntropy::reader(SNDFILE* sndfile, void* data_ptr, sf_count_t items, int
 	case SF_FORMAT_PCM_U8:
 	case SF_FORMAT_PCM_S8:
 	case SF_FORMAT_PCM_16:
+		//std::cout << "oi 16" << "\n";
 		return sf_read_short(sndfile, (short*)data_ptr, items);
 		break;
 	case SF_FORMAT_PCM_24:
 	case SF_FORMAT_PCM_32:
+		//std::cout << "oi 32" << "\n";
 		return sf_read_int(snd_file, (int*)data_ptr, items);
 		break;
 	case SF_FORMAT_FLOAT:
@@ -120,4 +122,8 @@ void AudioEntropy::save_histogram() {
 	}
 	fout << out.str();
 	fout.close();
+}
+
+const counter* AudioEntropy::get_counters(){
+	return hists;
 }
