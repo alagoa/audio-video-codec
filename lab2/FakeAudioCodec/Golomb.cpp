@@ -12,14 +12,13 @@ Golomb::encode(std::vector<std::vector<short>> residuals) {
 	for(auto &e : residuals) {
 		for(auto &v : e) {
 
-			// Left
 			transf = v >= 0 ? 2*v : (2*std::abs(v))-1;
 			q = transf / m;
 			r = transf - q*m;
 
-			out << q << "," << r << "|";
+			out << q << "," << r << "\n";
 		 }
-		 out << "\n";
+		 out << "\n\n";
 	}
 
 	out.close();
