@@ -24,17 +24,20 @@ AudioReader::AudioReader(std::string filename){
 }
 
 audio_data_t AudioReader::get_values(){
-	audio_data_t values;
+	audio_data_t values(snd_info.channels);
+	for (int i = 0; i < snd_info.channels; ++i)
+		values[i] = std::vector<short>(snd_info.frames);
 	short data [BUFFER_LEN];
-	int readcount, chan, k;
+	int readcount;
+	int count = 0;
 	while((readcount = read(data))){
 		for (int i = 0; i < readcount; i += snd_info.channels)
 		{
-			values.push_back(std::vector< short >(snd_info.channels));
 			for (int chan = 0; chan < snd_info.channels; ++chan)
 			{
-				values[i][chan] = data[i + chan];
+				values[chan][count] = data[i + chan];
 			}
+			count++;
 		}
 	}
 	return values;

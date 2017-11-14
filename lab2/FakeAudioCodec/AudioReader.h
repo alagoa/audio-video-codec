@@ -8,6 +8,8 @@
 
 #define BUFFER_LEN 1024
 typedef std::vector< std::vector<short> > audio_data_t;
+
+//[[],[],[]]
 class AudioReader
 {
 public:

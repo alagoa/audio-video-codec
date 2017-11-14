@@ -1,6 +1,6 @@
 P=FakeAudioCodec
-OBJECTS= FakeAudioCodec.o main.o
-DEBUG_OBJ= FakeAudioCodec_debug.o main_debug.o
+OBJECTS= Golomb.o AudioReader.o Predictor.o main.o
+DEBUG_OBJ= Golomb_debug.o AudioReader_debug.o Predictor_debug.o main_debug.o
 # BOOSTFLAGS=-lboost_system -lboost_serialization -lboost_program_options -lboost_filesystem
 CFLAGS = -Wall -O3 -g
 CFLAGS_DEBUG = -Wall -g
@@ -10,7 +10,7 @@ CC=g++
 all: $(P)
 # Generate application
 $(P): $(OBJECTS)
-	$(CC) $(CFLAGS) -o $(P) AudioEntropy_lib.o -lsndfile $(OBJECTS)
+	$(CC) $(CFLAGS) -o $(P) -lsndfile $(OBJECTS)
 # Generate object files
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c $< -o$@
