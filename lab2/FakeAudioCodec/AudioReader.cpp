@@ -41,7 +41,7 @@ audio_data_t AudioReader::get_values(){
 }
 
 int AudioReader::read(void* data_ptr){
-	return reader_f(sndfile, data_ptr, BUFFER_LEN);
+	return (*this.*reader_f)(data_ptr, BUFFER_LEN);
 }
 
 void AudioReader::get_reader(int format){
@@ -50,21 +50,21 @@ void AudioReader::get_reader(int format){
 	case SF_FORMAT_PCM_S8:
 	case SF_FORMAT_PCM_16:
 		//std::cout << "oi 16" << "\n";
-		reader_f = read_short;
+		reader_f = &AudioReader::read_short;
 		//return sf_read_short(sndfile, (short*)data_ptr, items);
 		break;
 	case SF_FORMAT_PCM_24:
 	case SF_FORMAT_PCM_32:
 		//std::cout << "oi 32" << "\n";
-		reader_f = read_int;
+		reader_f = &AudioReader::read_int;
 		//return sf_read_int(snd_file, (int*)data_ptr, items);
 		break;
 	case SF_FORMAT_FLOAT:
-		reader_f = read_float;
+		reader_f = &AudioReader::read_float;
 		//return sf_read_float(sndfile, (float*)data_ptr, items);
 		break;
 	case SF_FORMAT_DOUBLE:
-		reader_f = read_double;
+		reader_f = &AudioReader::read_double;
 		//return sf_read_double(sndfile, (double*)data_ptr, items);
 		break;
 	}
@@ -77,18 +77,18 @@ void AudioReader::close(){
 	sf_close(snd_file);
 }
 
-inline int AudioReader::read_short(SNDFILE* sndfile, void* data_ptr, sf_count_t items){
-	return sf_read_short(sndfile, (short*)data_ptr, items);
+inline int AudioReader::read_short(void* data_ptr, sf_count_t items){
+	return sf_read_short(snd_file, (short*)data_ptr, items);
 }
 
-inline int AudioReader::read_int(SNDFILE* sndfile, void* data_ptr, sf_count_t items){
+inline int AudioReader::read_int(void* data_ptr, sf_count_t items){
 	return sf_read_int(snd_file, (int*)data_ptr, items);
 }
 
-inline int AudioReader::read_float(SNDFILE* sndfile, void* data_ptr, sf_count_t items){
-	return sf_read_float(sndfile, (float*)data_ptr, items);
+inline int AudioReader::read_float(void* data_ptr, sf_count_t items){
+	return sf_read_float(snd_file, (float*)data_ptr, items);
 }
 
-inline int AudioReader::read_double(SNDFILE* sndfile, void* data_ptr, sf_count_t items){
-	return sf_read_double(sndfile, (double*)data_ptr, items);
+inline int AudioReader::read_double(void* data_ptr, sf_count_t items){
+	return sf_read_double(snd_file, (double*)data_ptr, items);
 }
