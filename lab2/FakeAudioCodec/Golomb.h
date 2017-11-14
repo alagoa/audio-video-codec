@@ -4,7 +4,7 @@
 class Golomb {
 	public:
 		Golomb(int m);
-		void enconde(std::vector<std::pair<short,short>> residuals);
+		void enconde(std::vector<std::vector<short>> residuals);
 		void decode(int* end);
 	private:
 		const int m;

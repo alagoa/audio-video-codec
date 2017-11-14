@@ -14,7 +14,8 @@ Predictor::order1_predict(short* seq, short* buff) {
 
 
 	// In the future this will be Golomb and streams
-	residuals.push_back(std::make_pair(rem_L, rem_R));
+	residuals(0).push_back(rem_L);
+	residuals(1).push_back(rem_R);
 
 }
 

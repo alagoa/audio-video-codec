@@ -10,5 +10,5 @@ class Predictor {
 		void order1_reverse(short* samples, short* buff);
 
 	private:
-		std::vector<std::pair<short,short>> residuals;
+		std::vector<std::vector<short>> residuals;
 }

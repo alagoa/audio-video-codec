@@ -7,20 +7,19 @@ Golomb::Golomb(int m) {
 
 }
 
-Golomb::encode(std::vector<std::pair<short,short>> residuals) {
+Golomb::encode(std::vector<std::vector<short>> residuals) {
 	int q,r,transf;
 	for(auto &e : residuals) {
-		// Left
-		transf = e.first >= 0 ? 2*e.first : (2*std::abs(e.first))-1;
-		q = transf / m;
-		r = transf - q*m;
+		for(auto &v : e) {
 
-		// Right
-		transf = e.second >= 0 ? 2*e.second : (2*std::abs(e.second))-1;
-		q = transf / m;
-		r = transf - q*m;
+			// Left
+			transf = v >= 0 ? 2*v : (2*std::abs(v))-1;
+			q = transf / m;
+			r = transf - q*m;
 
-		out << q << "," << r << "\n";
+			out << q << "," << r << "|";
+		 }
+		 out << "\n";
 	}
 
 	out.close();
