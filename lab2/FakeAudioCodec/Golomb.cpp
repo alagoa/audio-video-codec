@@ -10,19 +10,19 @@ Golomb::Golomb(int m) {
 
 }
 
-void Golomb::encoded(std::vector<std::vector<short>> residuals) {
+void Golomb::encode(std::vector<std::vector<short>> residuals) {
 	out.open("encoded.cod", std::ofstream::out);
 	int i;
 	int q,r,transf;
-	out << residuals[0].size() << " " << residuals.size() << "\n";
+	out << residuals[0].size() << " " << residuals.size() -1 << " " << residuals[residuals.size()-1][0] << "\n";
 	for(auto &e : residuals) {
 		i=0;
 		for(auto &v : e) {
 			i++;
 			transf = v >= 0 ? 2*v : (2*std::abs(v))-1;
 			q = transf / m;
-			r = transf - q*m;
-			out << q << " " << r << "\n";
+			r = transf - q*m
+;			out << q << " " << r << "\n";
 		 }
 		 out << "\n";
 	}
@@ -39,8 +39,10 @@ std::vector<std::vector<short>> Golomb::decode() {
 	int num_chan = 0;
 	int q, r;
 	int frames_per_chan = 0;
+	short order = 0;
 	in >> frames_per_chan;
 	in >> num_chan;
+	in >> order;
 	for (int i = 0; i < num_chan; ++i)
 	{
 		residuals.push_back(std::vector<short>(frames_per_chan));
@@ -53,5 +55,8 @@ std::vector<std::vector<short>> Golomb::decode() {
 	 		residuals[i][k] = num;
 		}
 	}
+	std::vector<short> order_vector;
+	order_vector.push_back(order);
+	residuals.push_back(order_vector);
 	return residuals;
 }

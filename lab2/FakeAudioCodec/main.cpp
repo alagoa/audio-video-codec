@@ -11,6 +11,7 @@ int main(int argc, char const *argv[])
 	delete ar;
 
 	/*
+	
 	std::vector<short> channel1 = {5, 10, 15, 20, 25, 30, 35, 40};
 	std::vector<short> channel2 = {5, 15, 25, 35, 45, 55, 65, 75};
 
@@ -19,10 +20,10 @@ int main(int argc, char const *argv[])
 	values.push_back(channel2);
 */
 	Predictor predictor;
-	Golomb golomb(32);
-	golomb.encoded(predictor.predict(values));
-	/*
-	std::vector<std::vector<short>> original = predictor.order1_reverse(golomb.decode());
+	Golomb golomb(4);
+	golomb.encode(predictor.predict(values));
+	
+	std::vector<std::vector<short>> original = predictor.reverse(golomb.decode());
 	
 	for(auto &e : original) {
 		std::cout << "channel-> ";
@@ -32,5 +33,5 @@ int main(int argc, char const *argv[])
 		std::cout << "\n";
 	}
 
-	*/
+	
 }

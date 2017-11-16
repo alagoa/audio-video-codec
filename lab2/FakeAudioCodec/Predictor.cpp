@@ -20,13 +20,13 @@ void Predictor::order1_predict(short* buff) {
 
 std::vector<std::vector<short>> Predictor::predict(std::vector<std::vector<short>> values) {
 	short rem;
-	std::vector<std::vector<short>> residuals, tmp;
+	std::vector<std::vector<short>> tmp;
 	AudioEntropy *ae = new AudioEntropy(values);
 	tmp = std::vector<std::vector<short>>(values);
 	double prev_entropy = ae->entropy();
 	double current_entropy = -1.0;
 	std::cout << "Original entropy: " << prev_entropy << "\n";
-	int order = 1;
+	short order = 1;
 	bool next_order = true;
 	while(next_order) 
 	{
@@ -44,22 +44,33 @@ std::vector<std::vector<short>> Predictor::predict(std::vector<std::vector<short
 		current_entropy = ae->entropy();
 		if(current_entropy >= prev_entropy) {
 			next_order = false;
+			std::vector<short> order_vector;
+			order_vector.push_back(order-1);
+			values.push_back(order_vector);
 			std::cout << "Chosen order: " << order-1 << "\n";
 		}
 		else {
 			prev_entropy = current_entropy;
-			residuals = tmp;
 			values = tmp;
 			order++;
 			std::cout << "order " << order-1 << " entropy: " << prev_entropy << "\n";
 		}
 		
 	}
-	return residuals;
+	return values;
 }
 
-std::vector<std::vector<short>> Predictor::reverse(std::vector<std::vector<short>> residuals, int order) {
-
+std::vector<std::vector<short>> Predictor::reverse(std::vector<std::vector<short>> residuals) {
+	short order = residuals[residuals.size()-1][0];
+	for(int i = order; i > 0; i--) {
+		for(int k = 0; k < residuals.size()-1; ++k) {
+			for(int i = 0; i < residuals[k].size()-1; ++i) {
+				residuals[k][i+1] = residuals[k][i+1] + residuals[k][i];
+			}
+		}
+		
+	}
+	return residuals;
 }
 
 
