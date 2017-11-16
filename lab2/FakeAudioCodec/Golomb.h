@@ -9,8 +9,8 @@ class Golomb {
 	public:
 		Golomb();
 		Golomb(int m);
-		void encoded(std::vector<std::vector<short>> residuals);
-		void decode();
+		void encode(std::vector<std::vector<short>> residuals);
+		std::vector<std::vector<short>> decode();
 		void f_write(std::string file_name);
 	private:
 		int m;

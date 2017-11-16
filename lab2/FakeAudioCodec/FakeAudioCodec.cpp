@@ -12,8 +12,11 @@ FakeAudioCodec::FakeAudioCodec(std::string filename){
 	std::cout << "begin AudioEntropy" << "\n";
 	AudioEntropy ae = AudioEntropy(filename);
 	std::cout << "done AudioEntropy" << "\n";
-	const counter *hists = ae.get_counters();
+	this->hists = ae.get_counters();
+	this->snd_info = ae.get_snd_info();
 	std::cout << "start printing" << "\n";
+	std::cout << "m = " << get_m();
+	/*
 	for (auto it = hists[0].begin(); it != hists[0].end(); ++it)
 	{
 		q = ((unsigned short)(it->first) / m);
@@ -21,6 +24,8 @@ FakeAudioCodec::FakeAudioCodec(std::string filename){
 		r = ((unsigned short)it->first) - q * m;
 		std::cout << q_s << std::bitset<16>(r) << "\n";
 	}
+	*/
+
 }
 std::string FakeAudioCodec::to_unary_code_s(unsigned short val){
 	std::string unary = "0";
@@ -38,8 +43,6 @@ unsigned short FakeAudioCodec::to_unary_code(unsigned short val){
 		unary += (1 << i);
 	return unary;
 }
-
-
 
 FakeAudioCodec::~FakeAudioCodec(){
 
