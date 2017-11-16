@@ -24,7 +24,6 @@ std::vector<std::vector<short>> Predictor::predict(std::vector<std::vector<short
 	AudioEntropy *ae = new AudioEntropy(values);
 	tmp = std::vector<std::vector<short>>(values);
 	double prev_entropy = ae->entropy();
-	delete ae;
 	double current_entropy = -1.0;
 	std::cout << "Original entropy: " << prev_entropy << "\n";
 	int order = 1;
@@ -41,8 +40,8 @@ std::vector<std::vector<short>> Predictor::predict(std::vector<std::vector<short
 			}
 
 		}
-		AudioEntropy ae_res(tmp);
-		current_entropy = ae_res.entropy();
+		ae = new AudioEntropy(tmp);
+		current_entropy = ae->entropy();
 		if(current_entropy >= prev_entropy) {
 			next_order = false;
 			std::cout << "Chosen order: " << order-1 << "\n";
