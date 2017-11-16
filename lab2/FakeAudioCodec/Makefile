@@ -1,6 +1,6 @@
 P=FakeAudioCodec
-OBJECTS= Golomb.o AudioReader.o Predictor.o main.o
-DEBUG_OBJ= Golomb_debug.o AudioReader_debug.o Predictor_debug.o main_debug.o
+OBJECTS= Golomb.o AudioReader.o Predictor.o AudioEntropy.o main.o
+DEBUG_OBJ= Golomb_debug.o AudioReader_debug.o Predictor_debug.o AudioEntropy_debug.o main_debug.o
 # BOOSTFLAGS=-lboost_system -lboost_serialization -lboost_program_options -lboost_filesystem
 CFLAGS = -Wall -O3 -g
 CFLAGS_DEBUG = -Wall -g

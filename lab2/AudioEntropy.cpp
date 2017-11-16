@@ -6,7 +6,35 @@ AudioEntropy::AudioEntropy(){
 
 AudioEntropy::~AudioEntropy(){
 	free(hists);
-	sf_close(snd_file);
+	if(snd_file)
+		sf_close(snd_file);
+}
+
+AudioEntropy::AudioEntropy(std::vector<std::vector<short>> values) {
+	snd_file = NULL;
+	memset (&snd_info, 0, sizeof (snd_info)) ;
+	snd_info.frames = values[0].size();
+	snd_info.channels = values.size();
+	hists = (counter*) malloc(sizeof(counter) * (values.size() + 1));
+	if (hists == NULL)
+	{
+		std::cout << "Error in malloc!\n";
+		return;
+	}
+	for (int i = 0; i < snd_info.channels + 1; ++i)
+	{
+		hists[i] = counter();
+	}
+	for (int chan = 0 ; chan < values.size() ; chan ++) {
+		for (int k = chan ; k < values[0].size() ; k++) {
+			hists[chan][ values[chan][k] ]++;	
+			hists[values.size()][ values[chan][k] ] ++;	// Add values to mono channel
+		}
+	}
+	// Process mono channel with round up integer division
+	for (counter::iterator it = hists[values.size()].begin(); it != hists[values.size()].end(); ++it) {
+		it->second = (it->second + (values.size() - 1)) / values.size();
+	}
 }
 
 AudioEntropy::AudioEntropy(std::string filename){
@@ -39,9 +67,8 @@ AudioEntropy::AudioEntropy(std::string filename){
 	for (counter::iterator it = hists[snd_info.channels].begin(); it != hists[snd_info.channels].end(); ++it) {
 		it->second = (it->second + (snd_info.channels - 1)) / snd_info.channels;
 	}
-
 	//print_histogram();
-	save_histogram();
+	//save_histogram();
 }
 
 
@@ -126,4 +153,8 @@ void AudioEntropy::save_histogram() {
 
 const counter* AudioEntropy::get_counters(){
 	return hists;
+}
+
+SF_INFO AudioEntropy::get_snd_info() {
+	return snd_info;
 }

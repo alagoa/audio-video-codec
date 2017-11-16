@@ -22,7 +22,6 @@ void Golomb::encoded(std::vector<std::vector<short>> residuals) {
 			transf = v >= 0 ? 2*v : (2*std::abs(v))-1;
 			q = transf / m;
 			r = transf - q*m;
-
 			out << q << " " << r << "\n";
 		 }
 		 out << "\n";
@@ -30,11 +29,13 @@ void Golomb::encoded(std::vector<std::vector<short>> residuals) {
 	out.close();
 }
 
-void Golomb::decode() {
+std::vector<std::vector<short>> Golomb::decode() {
 	std::ifstream in("encoded.cod");
+	std::vector<std::vector<short>> residuals;
 	//in.open("encoded.cod");
 	//char linha[20];
 	std::string line;
+	short num;
 	int num_chan = 0;
 	int q, r;
 	int frames_per_chan = 0;
@@ -42,11 +43,15 @@ void Golomb::decode() {
 	in >> num_chan;
 	for (int i = 0; i < num_chan; ++i)
 	{
+		residuals.push_back(std::vector<short>(frames_per_chan));
 		for (int k = 0; k < frames_per_chan; ++k)
 		{
 	 		in >> q;
 	 		in >> r;
-	 		std::cout << "q: " << q << " r: " << r << "\n"; 
+	 		num = q*m + r;
+	 		num = num%2 == 0 ? num/2 : ((num/-2)-1);
+	 		residuals[i][k] = num;
 		}
 	}
+	return residuals;
 }
