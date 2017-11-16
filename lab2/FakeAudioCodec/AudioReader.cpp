@@ -23,10 +23,18 @@ AudioReader::AudioReader(std::string filename){
 	*/
 }
 
+int AudioReader::get_info(SF_INFO* info){
+	info->frames = snd_info.frames;
+	info->samplerate = snd_info.samplerate;
+	info->channels = snd_info.channels;
+	info->format = snd_info.format;
+	return 0;
+}
+
 audio_data_t AudioReader::get_values(){
 	audio_data_t values(snd_info.channels);
 	for (int i = 0; i < snd_info.channels; ++i)
-		values[i] = std::vector<short>(snd_info.frames);
+		values[i] = channel_data_t(snd_info.frames);
 	short data [BUFFER_LEN];
 	int readcount;
 	int count = 0;

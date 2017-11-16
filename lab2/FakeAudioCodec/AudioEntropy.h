@@ -8,9 +8,8 @@
 #include <map>
 #include <fstream>
 #include <algorithm>
-#include <vector>
+#include "structures.h"
 
-#define BUFFER_LEN 1024
 typedef std::map<int, unsigned int> counter;
 
 class AudioEntropy
@@ -18,7 +17,7 @@ class AudioEntropy
 public:
 	AudioEntropy();
 	AudioEntropy(std::string filename);
-	AudioEntropy(std::vector<std::vector<short>> values);
+	AudioEntropy(audio_data_t values);
 	~AudioEntropy();
 	void process_data(short *data, int count, int channels);
 	void print_histogram();

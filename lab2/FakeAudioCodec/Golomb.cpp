@@ -10,7 +10,7 @@ Golomb::Golomb(int m) {
 
 }
 
-void Golomb::encode(std::vector<std::vector<short>> residuals) {
+void Golomb::encode(audio_data_t residuals) {
 	out.open("encoded.cod", std::ofstream::out);
 	int i;
 	int q,r,transf;
@@ -29,9 +29,9 @@ void Golomb::encode(std::vector<std::vector<short>> residuals) {
 	out.close();
 }
 
-std::vector<std::vector<short>> Golomb::decode() {
+audio_data_t Golomb::decode() {
 	std::ifstream in("encoded.cod");
-	std::vector<std::vector<short>> residuals;
+	audio_data_t residuals;
 	//in.open("encoded.cod");
 	//char linha[20];
 	std::string line;
@@ -45,7 +45,7 @@ std::vector<std::vector<short>> Golomb::decode() {
 	in >> order;
 	for (int i = 0; i < num_chan; ++i)
 	{
-		residuals.push_back(std::vector<short>(frames_per_chan));
+		residuals.push_back(channel_data_t(frames_per_chan));
 		for (int k = 0; k < frames_per_chan; ++k)
 		{
 	 		in >> q;
@@ -55,7 +55,7 @@ std::vector<std::vector<short>> Golomb::decode() {
 	 		residuals[i][k] = num;
 		}
 	}
-	std::vector<short> order_vector;
+	channel_data_t order_vector;
 	order_vector.push_back(order);
 	residuals.push_back(order_vector);
 	return residuals;

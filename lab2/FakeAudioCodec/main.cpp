@@ -1,14 +1,19 @@
 #include "AudioReader.h"
+#include "AudioWriter.h"
 #include "Predictor.h"
 #include "Golomb.h"
+#include <sndfile.h>
 
 int main(int argc, char const *argv[])
 {
-
-
+	SF_INFO snd_info;
 	AudioReader *ar = new AudioReader(argv[1]);
 	audio_data_t values = ar->get_values();
-	delete ar;
+	memset (&snd_info, 0, sizeof (snd_info));
+	ar->get_info(&snd_info);
+	AudioWriter a_out(std::string("out.wav"), snd_info.frames, 
+		snd_info.samplerate, snd_info.channels, snd_info.format);
+	//delete ar;
 
 	/*
 	
@@ -24,7 +29,7 @@ int main(int argc, char const *argv[])
 	golomb.encode(predictor.predict(values));
 	
 	std::vector<std::vector<short>> original = predictor.reverse(golomb.decode());
-	
+	a_out.write_values(original);
 	for(auto &e : original) {
 		std::cout << "channel-> ";
 		for(auto &v : e) {
@@ -32,6 +37,6 @@ int main(int argc, char const *argv[])
 		}
 		std::cout << "\n";
 	}
-
+	return 0;
 	
 }

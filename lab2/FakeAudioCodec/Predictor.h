@@ -2,17 +2,17 @@
 #include <fstream>
 #include <string>
 #include <istream>
-#include <vector>
+#include "structures.h"
 #include "AudioEntropy.h"
 
 class Predictor {
 	public:
 		Predictor();
 		///void order1_predict(short* buff);
-		std::vector<std::vector<short>> predict(std::vector<std::vector<short>> values);
-		std::vector<std::vector<short>> reverse(std::vector<std::vector<short>> residuals);
-		std::vector<std::vector<short>> order1_predict(std::vector<std::vector<short>> values); 
-		std::vector<std::vector<short>> order1_reverse(std::vector<std::vector<short>> residuals);
+		audio_data_t predict(audio_data_t values);
+		audio_data_t reverse(audio_data_t residuals);
+		audio_data_t order1_predict(audio_data_t values); 
+		audio_data_t order1_reverse(audio_data_t residuals);
 
 	private:
 };
