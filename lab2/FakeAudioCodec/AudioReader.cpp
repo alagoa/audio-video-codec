@@ -28,6 +28,8 @@ int AudioReader::get_info(SF_INFO* info){
 	info->samplerate = snd_info.samplerate;
 	info->channels = snd_info.channels;
 	info->format = snd_info.format;
+	info->sections = snd_info.sections;
+	info->seekable = snd_info.seekable;
 	return 0;
 }
 

@@ -11,7 +11,7 @@ class AudioWriter
 public:
 	AudioWriter();
 	AudioWriter(std::string filename, sf_count_t frames,
- int samplerate, int channels, int format);
+ 				int samplerate, int channels, int format, int sections, int seekable);
 	~AudioWriter();
 	void close();
 	int write_values(audio_data_t data);

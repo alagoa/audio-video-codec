@@ -12,7 +12,7 @@ int main(int argc, char const *argv[])
 	memset (&snd_info, 0, sizeof (snd_info));
 	ar->get_info(&snd_info);
 	AudioWriter a_out(std::string("out.wav"), snd_info.frames, 
-		snd_info.samplerate, snd_info.channels, snd_info.format);
+		snd_info.samplerate, snd_info.channels, snd_info.format, snd_info.sections, snd_info.seekable);
 	//delete ar;
 
 	/*
