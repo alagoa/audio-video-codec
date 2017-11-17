@@ -4,29 +4,31 @@ Golomb::Golomb(){
 
 }
 
-Golomb::Golomb(int m) {
+Golomb::Golomb(int m){
 	this->m = m;
 	this->b = std::log2(m);
 
 }
 
-void Golomb::encode(audio_data_t residuals) {
-	out.open("encoded.cod", std::ofstream::out);
-	int i;
+uint Golomb::encode(audio_data_t residuals) {
 	int q,r,transf;
+	uint final_size = 0;
+	//init_size = residuals.size() * residuals[0].size() * sizeof(short);
+	out.open("encoded.cod", std::ofstream::out);
 	out << residuals[0].size() << " " << residuals.size() -1 << " " << residuals[residuals.size()-1][0] << "\n";
+	residuals.pop_back();
 	for(auto &e : residuals) {
-		i=0;
 		for(auto &v : e) {
-			i++;
 			transf = v >= 0 ? 2*v : (2*std::abs(v))-1;
 			q = transf / m;
-			r = transf - q*m
-;			out << q << " " << r << "\n";
+			r = transf - q*m;
+			final_size += (q ) + b;
+			out << q << " " << r << "\n";
 		 }
 		 out << "\n";
 	}
 	out.close();
+	return final_size / 8;
 }
 
 audio_data_t Golomb::decode() {
