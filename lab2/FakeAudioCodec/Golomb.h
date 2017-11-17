@@ -7,7 +7,7 @@ class Golomb {
 	public:
 		Golomb();
 		Golomb(int m);
-		void encode(audio_data_t residuals);
+		uint encode(audio_data_t residuals);
 		audio_data_t decode();
 		void f_write(std::string file_name);
 	private:
