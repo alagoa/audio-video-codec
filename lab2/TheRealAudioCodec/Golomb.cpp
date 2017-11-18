@@ -72,6 +72,7 @@ encoded_data_t Golomb::real_encode(audio_data_t residuals, int *final_m) {
 	encoded_data_t result;
 	uint q,r,transf, prev_size = UINT_MAX, final_size = 0, original = residuals.size() * residuals[0].size() * sizeof(short);
 	m = 2;
+	b = std::log(m);
 	std::cout << "Original size = " << original << "\n";
 	bool next_m = true;
 	while(next_m) {
@@ -81,8 +82,8 @@ encoded_data_t Golomb::real_encode(audio_data_t residuals, int *final_m) {
 			for(auto &v : e) {
 				transf = v >= 0 ? 2*v : (2*std::abs(v))-1;
 				q = transf / m;
-				r = transf - q*m;
-				final_size += (q ) + b;
+				r = transf % m;
+				final_size += ((q+1) + b);
 				channel.push_back(std::make_pair(q,r));
 			 }
 			 result.push_back(channel);
@@ -93,6 +94,7 @@ encoded_data_t Golomb::real_encode(audio_data_t residuals, int *final_m) {
 			prev_size = final_size/8;
 			final_size = 0;
 			m <<= 1;
+			b = std::log(m);
 			result.clear();
 		}
 		else {
