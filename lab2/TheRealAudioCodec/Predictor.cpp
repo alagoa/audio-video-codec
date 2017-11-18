@@ -18,7 +18,7 @@ void Predictor::order1_predict(short* buff) {
 }
 */
 
-audio_data_t Predictor::predict(audio_data_t values) {
+audio_data_t Predictor::predict(audio_data_t values, int *pred_order) {
 	short rem;
 	audio_data_t tmp;
 	AudioEntropy *ae = new AudioEntropy(values);
@@ -44,10 +44,8 @@ audio_data_t Predictor::predict(audio_data_t values) {
 		current_entropy = ae->entropy();
 		if(current_entropy >= prev_entropy) {
 			next_order = false;
-			channel_data_t order_vector;
-			order_vector.push_back(order-1);
-			values.push_back(order_vector);
-			std::cout << "Chosen order: " << order-1 << "\n";
+			*pred_order = order-1;
+			std::cout << "Chosen order: " << *pred_order << "\n";
 		}
 		else {
 			prev_entropy = current_entropy;
@@ -60,10 +58,9 @@ audio_data_t Predictor::predict(audio_data_t values) {
 	return values;
 }
 
-audio_data_t Predictor::reverse(audio_data_t residuals) {
-	short order = residuals[residuals.size()-1][0];
+audio_data_t Predictor::reverse(audio_data_t residuals, int order) {
 	for(int i = order; i > 0; i--) {
-		for(uint k = 0; k < residuals.size()-1; ++k) {
+		for(uint k = 0; k < residuals.size(); ++k) {
 			for(uint i = 0; i < residuals[k].size()-1; ++i) {
 				residuals[k][i+1] = residuals[k][i+1] + residuals[k][i];
 			}

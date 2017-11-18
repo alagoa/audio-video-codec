@@ -5,26 +5,21 @@ AudioWriter::AudioWriter(){
 }
 
 
-AudioWriter::AudioWriter(std::string filename, sf_count_t frames,
- 						 int samplerate, int channels, int format, int sections, int seekable){
-	memset (&snd_info, 0, sizeof (snd_info)) ;
-	snd_info.frames = frames;
-	f_plswork = frames;
-	snd_info.samplerate = samplerate;
-	snd_info.channels = channels;
-	snd_info.format = format;
-	snd_info.sections = sections;
-	snd_info.seekable = seekable;
+AudioWriter::AudioWriter(std::string filename){
+	this->filename = filename;	
+}
+
+
+int AudioWriter::write_values(audio_data_t data, SF_INFO new_snd_info){
+	snd_info = new_snd_info;
+	f_plswork = snd_info.frames;
 	snd_file = sf_open(filename.c_str(), SFM_WRITE, &snd_info);
 	if (snd_file == NULL)
 	{
 		std::cout << sf_strerror(snd_file) << "\n";
-		return;
+		return -1;
 	}
-}
 
-
-int AudioWriter::write_values(audio_data_t data){
 	short *buffer;
 	snd_info.frames = f_plswork;
 	if (! (buffer = (short*)malloc (snd_info.channels * snd_info.frames * sizeof (short))))

@@ -66,15 +66,12 @@ int Bitstream::readBits(int n_bits) {
 	return read_buffer;
 }
 
-void Bitstream::writeFile(encoded_data_t golomb_encoded) {
-	for(auto &chan : golomb_encoded) {
-		for(auto &qm : chan) {
-			writeBits(qm.first, 8);
-			writeBits(qm.second, 8);
-		}
-	}
+void Bitstream::writeFile(encoded_data_t golomb_encoded, SF_INFO snd_info, int order) {
+	/* TODO */
 }
 
-encoded_data_t Bitstream::readFile() {
-
+encoded_data_t Bitstream::readFile(SF_INFO *new_snd_info, int *dec_order, int *new_m) {
+	encoded_data_t result;
+	/* TODO */
+	return result;
 }

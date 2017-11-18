@@ -10,11 +10,10 @@ class AudioWriter
 {
 public:
 	AudioWriter();
-	AudioWriter(std::string filename, sf_count_t frames,
- 				int samplerate, int channels, int format, int sections, int seekable);
+	AudioWriter(std::string filename);
 	~AudioWriter();
 	void close();
-	int write_values(audio_data_t data);
+	int write_values(audio_data_t data, SF_INFO new_snd_info);
 	//int write(void* data_ptr);
 private:
 	/*
@@ -27,6 +26,7 @@ private:
 	sf_count_t f_plswork;
 	SF_INFO snd_info;
 	SNDFILE* snd_file;
+	std::string filename;
 	//int (AudioReader::*reader_f)(void*, sf_count_t) = NULL;
 	
 };
