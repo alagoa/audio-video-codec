@@ -15,7 +15,7 @@ int main(int argc, char const *argv[])
 	ar->get_info(&snd_info);
 
 	Predictor predictor;
-	Golomb golomb(m);
+	Golomb golomb;
 	int order;
 
 /* REAL */
@@ -23,7 +23,9 @@ int main(int argc, char const *argv[])
 	// Encoding
 	Bitstream bs_write("encoded_bitstream.cod", "w");
 	audio_data_t pred = predictor.predict(values, &order);
-	bs_write.writeFile(golomb.real_encode(pred), snd_info, order);
+	encoded_data_t encoded_data = golomb.real_encode(pred, &m);
+	//bs_write.writeFile(encoded, snd_info, order, m);
+	
 	// Decoding
 	AudioWriter a_out(std::string("out.wav"));
 	SF_INFO new_snd_info;

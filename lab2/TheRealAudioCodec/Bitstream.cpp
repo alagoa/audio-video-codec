@@ -66,7 +66,7 @@ int Bitstream::readBits(int n_bits) {
 	return read_buffer;
 }
 
-void Bitstream::writeFile(encoded_data_t golomb_encoded, SF_INFO snd_info, int order) {
+void Bitstream::writeFile(encoded_data_t golomb_encoded, SF_INFO snd_info, int order, int m) {
 	/* TODO */
 }
 

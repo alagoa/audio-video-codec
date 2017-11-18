@@ -15,7 +15,7 @@ class Bitstream
 		void writeBits(int value, int n_bits);
 		int readBits(int n_bits);
 		int getByteCount();
-		void writeFile(encoded_data_t golomb_encoded, SF_INFO snd_info, int order);
+		void writeFile(encoded_data_t golomb_encoded, SF_INFO snd_info, int order, int m);
 		encoded_data_t readFile(SF_INFO *new_snd_info, int *dec_order, int *new_m);
 
 
