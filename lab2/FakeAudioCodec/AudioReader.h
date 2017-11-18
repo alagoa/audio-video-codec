@@ -13,7 +13,7 @@ public:
 	AudioReader(std::string filename);
 	~AudioReader();
 	void close();
-	audio_data_t get_values();
+	void get_values(audio_data_t &values);
 	int read(void* data_ptr);
 	int get_info(SF_INFO* info);
 

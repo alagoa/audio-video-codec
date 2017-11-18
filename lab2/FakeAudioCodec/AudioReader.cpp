@@ -33,10 +33,10 @@ int AudioReader::get_info(SF_INFO* info){
 	return 0;
 }
 
-audio_data_t AudioReader::get_values(){
-	audio_data_t values(snd_info.channels);
+void AudioReader::get_values(audio_data_t &values){
+	//values.push_back(snd_info.channels);
 	for (int i = 0; i < snd_info.channels; ++i)
-		values[i] = channel_data_t(snd_info.frames);
+		values.push_back(channel_data_t(snd_info.frames));
 	short data [BUFFER_LEN];
 	int readcount;
 	int count = 0;
@@ -50,7 +50,6 @@ audio_data_t AudioReader::get_values(){
 			count++;
 		}
 	}
-	return values;
 }
 
 int AudioReader::read(void* data_ptr){

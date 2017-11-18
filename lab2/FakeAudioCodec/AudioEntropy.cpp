@@ -9,7 +9,7 @@ AudioEntropy::~AudioEntropy(){
 	sf_close(snd_file);
 }
 
-AudioEntropy::AudioEntropy(audio_data_t values) {
+AudioEntropy::AudioEntropy(audio_data_t const &values) {
 	memset (&snd_info, 0, sizeof (snd_info)) ;
 	snd_info.frames = values[0].size();
 	snd_info.channels = values.size();

@@ -17,7 +17,7 @@ class AudioEntropy
 public:
 	AudioEntropy();
 	AudioEntropy(std::string filename);
-	AudioEntropy(audio_data_t values);
+	AudioEntropy(audio_data_t const &values);
 	~AudioEntropy();
 	void process_data(short *data, int count, int channels);
 	void print_histogram();

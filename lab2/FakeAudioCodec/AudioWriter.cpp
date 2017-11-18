@@ -24,7 +24,7 @@ AudioWriter::AudioWriter(std::string filename, sf_count_t frames,
 }
 
 
-int AudioWriter::write_values(audio_data_t data){
+int AudioWriter::write_values(audio_data_t const &data){
 	short *buffer;
 	snd_info.frames = f_plswork;
 	if (! (buffer = (short*)malloc (snd_info.channels * snd_info.frames * sizeof (short))))
