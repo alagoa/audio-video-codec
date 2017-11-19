@@ -24,7 +24,11 @@ Bitstream::~Bitstream() {
 
 }
 
-void Bitstream::close() {	
+void Bitstream::close() {
+	if (mode != "r")
+	{
+		file.write(&w_buff, sizeof(char));
+	}	
 	file.close();
 }
 
