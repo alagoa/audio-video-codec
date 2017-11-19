@@ -10,7 +10,7 @@ AudioWriter::AudioWriter(std::string filename){
 }
 
 
-int AudioWriter::write_values(audio_data_t data, SF_INFO new_snd_info){
+int AudioWriter::write_values(audio_data_t const &data, SF_INFO new_snd_info){
 	snd_info = new_snd_info;
 	f_plswork = snd_info.frames;
 	snd_file = sf_open(filename.c_str(), SFM_WRITE, &snd_info);

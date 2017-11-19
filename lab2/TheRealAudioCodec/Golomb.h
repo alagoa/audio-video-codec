@@ -5,6 +5,8 @@
 #include "structures.h"
 #include <climits>
 
+typedef std::vector< uint > channel_transform_t;
+typedef std::vector< channel_transform_t > golomb_transform_t;
 class Golomb {
 	public:
 		Golomb();
@@ -25,7 +27,7 @@ class Golomb {
 		 *
 		 * @return     The best m to use
 		 */
-		ushort find_m(audio_data_t const &residuals, audio_data_t &transf_data);
+		ushort find_m(audio_data_t const &residuals, golomb_transform_t &transf_data);
 		ushort get_m(){return m;};
 		/**
 		 * @brief      Decode the vaules at encoded with the m found when encoding

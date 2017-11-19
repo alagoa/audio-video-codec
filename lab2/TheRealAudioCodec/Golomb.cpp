@@ -65,9 +65,9 @@ audio_data_t Golomb::decode(SF_INFO *snd_info, int *order) {
 }
 */
 uint Golomb::real_encode(audio_data_t const &residuals, encoded_data_t *out) {
-	int q,r;
+	uint q,r;
 	uint final_size = 0;
-	audio_data_t tranformed_data;
+	golomb_transform_t tranformed_data;
 	find_m(residuals, tranformed_data);
 	for(auto &e : tranformed_data) {
 		out->push_back(encoded_channel_t());
@@ -81,7 +81,7 @@ uint Golomb::real_encode(audio_data_t const &residuals, encoded_data_t *out) {
 	return final_size / 8;
 }
 
-ushort Golomb::find_m(audio_data_t const &residuals, audio_data_t &transf_data){
+ushort Golomb::find_m(audio_data_t const &residuals, golomb_transform_t &transf_data){
 	uint q,transf, prev_size, final_size, original;
 	bool next_m;
 	original = residuals.size() * residuals[0].size() * sizeof(short);
@@ -93,7 +93,7 @@ ushort Golomb::find_m(audio_data_t const &residuals, audio_data_t &transf_data){
 	next_m = true;
 	std::cout << "\tTrying m = " << m << "...\n";
 	for(auto &e : residuals) {
-		channel_data_t channel;
+		channel_transform_t channel;
 		for(auto &v : e) {
 			transf = v >= 0 ? 2*v : (2*std::abs(v))-1;
 			q = transf / m;
@@ -137,9 +137,9 @@ ushort Golomb::find_m(audio_data_t const &residuals, audio_data_t &transf_data){
 void Golomb::real_decode(encoded_data_t const &encoded, audio_data_t *decoded) {
 	if (m == 0)
 		return;
-	short num;
+	int num;
 	int num_chan = encoded.size();
-	int q, r;
+	uint q, r;
 	int frames_per_chan = encoded[0].size();
 	for (int i = 0; i < num_chan; ++i)
 	{
@@ -156,7 +156,7 @@ void Golomb::real_decode(encoded_data_t const &encoded, audio_data_t *decoded) {
 }
 
 void Golomb::real_decode(encoded_data_t const &encoded, audio_data_t *decoded, ushort new_m) {
-	short num;
+	int num;
 	int num_chan = encoded.size();
 	int q, r;
 	int frames_per_chan = encoded[0].size();

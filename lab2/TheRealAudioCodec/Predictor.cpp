@@ -4,7 +4,7 @@ Predictor::Predictor() {
 }
 
 short Predictor::predict(audio_data_t &values) {
-	short rem;
+	int rem;
 	audio_data_t tmp;
 	short order = 1;
 	bool next_order = true;
