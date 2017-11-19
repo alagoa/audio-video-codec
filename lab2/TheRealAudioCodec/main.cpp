@@ -7,32 +7,40 @@
 
 int main(int argc, char const *argv[])
 {
-	int m = std::atoi(argv[2]);
-	SF_INFO snd_info;
-	AudioReader *ar = new AudioReader(argv[1]);
-	audio_data_t values = ar->get_values();
-	memset (&snd_info, 0, sizeof (snd_info));
-	ar->get_info(&snd_info);
-
 	Predictor predictor;
 	Golomb golomb;
-	int order;
-
+	short order;
+	int m;
+	audio_data_t values, decoded;
+	encoded_data_t encoded_data, encoded_file;
+	SF_INFO snd_info;
+	AudioReader *ar;
+	
+	//m = std::atoi(argv[2]);
+	ar = new AudioReader(argv[1]);
+	ar->get_values(values);
+	memset (&snd_info, 0, sizeof (snd_info));
+	ar->get_info(&snd_info);
 /* REAL */
 
 	// Encoding
 	Bitstream bs_write("encoded_bitstream.cod", "w");
-	audio_data_t pred = predictor.predict(values, &order);
-	encoded_data_t encoded_data = golomb.real_encode(pred, &m);
-	//bs_write.writeFile(encoded, snd_info, order, m);
+	order = predictor.predict(values);
+	golomb.real_encode(values, &encoded_data);
+	m = golomb.get_m();
+	bs_write.writeFile(encoded_data, snd_info, order, m);
+	bs_write.close();
 	
 	// Decoding
 	AudioWriter a_out(std::string("out.wav"));
 	SF_INFO new_snd_info;
-	int dec_order = -1, new_m = -1;
+	ushort dec_order = -1, new_m = -1;
 	Bitstream bs_read("encoded_bitstream.cod", "r");
-	encoded_data_t encoded = bs_read.readFile(&new_snd_info, &dec_order, &new_m);
-	a_out.write_values(predictor.reverse(golomb.real_decode(encoded, new_m), dec_order), new_snd_info);
+	encoded_file = bs_read.readFile(&new_snd_info, &dec_order, &new_m);
+	bs_read.close();
+	golomb.real_decode(encoded_file, &decoded, new_m);
+	predictor.reverse(decoded, dec_order);
+	a_out.write_values(decoded, new_snd_info);
 
 /* FAKE */
 /*
