@@ -82,15 +82,13 @@ uint Golomb::real_encode(audio_data_t const &residuals, encoded_data_t *out) {
 }
 
 ushort Golomb::find_m(audio_data_t const &residuals, golomb_transform_t &transf_data){
-	uint q,transf, prev_size, final_size, original;
-	bool next_m;
+	uint q,transf, final_size, original, min_size = UINT_MAX;
+	ushort final_m;
 	original = residuals.size() * residuals[0].size() * sizeof(short);
-	prev_size = UINT_MAX;
 	final_size = 0;
 	m = 2;
 	b = std::log2(m);
 	std::cout << "Original size = " << original << "\n";
-	next_m = true;
 	std::cout << "\tTrying m = " << m << "...\n";
 	for(auto &e : residuals) {
 		channel_transform_t channel;
@@ -104,12 +102,11 @@ ushort Golomb::find_m(audio_data_t const &residuals, golomb_transform_t &transf_
 	}
 	final_size = final_size/8;
 	std::cout << "\t\tsize for current m = " << final_size << "\n";
-	prev_size = final_size;
 	final_size = 0;
 	m <<= 1;
 	b = std::log2(m);
 
-	while(next_m) {
+	while(m < std::pow(2, 15)) {
 		std::cout << "\tTrying m = " << m << "...\n";
 		for(auto &e : transf_data) {
 			for(auto &v : e) {
@@ -119,19 +116,18 @@ ushort Golomb::find_m(audio_data_t const &residuals, golomb_transform_t &transf_
 		}
 		final_size = final_size/8;
 		std::cout << "\t\tsize for current m = " << final_size << "\n";
-		if(final_size < prev_size ) {
-			prev_size = final_size;
-			final_size = 0;
-			m <<= 1;
-			b = std::log2(m);
+		if(final_size < min_size ) {
+			min_size = final_size;
+			final_m = m;
 		}
-		else {
-			next_m = false;
-		}
+		final_size = 0;
+		m <<= 1;
+		b = std::log2(m);
 	}
-	m >>= 1;
-	std::cout << "chosen m -> " << m << "\n";
-	return m;
+	std::cout << "chosen m -> " << final_m << "\n";
+	this->m = final_m;
+	this->b = std::log2(m);
+	return final_m;
 }
 
 void Golomb::real_decode(encoded_data_t const &encoded, audio_data_t *decoded) {
