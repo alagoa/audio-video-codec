@@ -25,7 +25,7 @@ class Golomb {
 		 * @param      residuals    The residuals
 		 * @param      transf_data  The transformed data to use in golomb coding
 		 *
-		 * @return     The best m to use
+		 * @return     The final size of the encoded data
 		 */
 		ushort find_m(audio_data_t const &residuals, golomb_transform_t &transf_data);
 		ushort get_m(){return m;};

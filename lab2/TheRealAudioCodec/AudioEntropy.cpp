@@ -5,32 +5,21 @@ AudioEntropy::AudioEntropy(){
 }
 
 AudioEntropy::~AudioEntropy(){
-	free(hists);
+	//free(hists);
 	sf_close(snd_file);
 }
 
-AudioEntropy::AudioEntropy(audio_data_t values) {
+AudioEntropy::AudioEntropy(audio_data_t const &values) {
 	memset (&snd_info, 0, sizeof (snd_info)) ;
 	snd_info.frames = values[0].size();
 	snd_info.channels = values.size();
-	hists = (counter*) malloc(sizeof(counter) * (values.size() + 1));
-	if (hists == NULL)
-	{
-		std::cout << "Error in malloc!\n";
-		return;
-	}
-	for (int i = 0; i < snd_info.channels + 1; ++i)
-	{
-		hists[i] = counter();
-	}
 	for (uint chan = 0 ; chan < values.size() ; chan ++) {
-		for (uint k = 0 ; k < values[0].size() ; k++) {
-			hists[chan][ values[chan][k] ]++;	
-			hists[values.size()][ values[chan][k] ] ++;	// Add values to mono channel
+		for (uint k = 0 ; k < values[0].size() ; k++) {	
+			hists[ values[chan][k] ] ++;	// Add values to mono channel
 		}
 	}
 	// Process mono channel with round up integer division
-	for (counter::iterator it = hists[values.size()].begin(); it != hists[values.size()].end(); ++it) {
+	for (counter::iterator it = hists.begin(); it != hists.end(); ++it) {
 		it->second = (it->second + (values.size() - 1)) / values.size();
 	}
 }
@@ -45,16 +34,6 @@ AudioEntropy::AudioEntropy(std::string filename){
 		std::cout << sf_strerror(snd_file) << "\n";
 		return;
 	}
-	hists = (counter*) malloc(sizeof(counter) * (snd_info.channels + 1));						// All channels + MONO
-	if (hists == NULL)
-	{
-		std::cout << "Error in malloc!\n";
-		return;
-	}
-	for (int i = 0; i < snd_info.channels + 1; ++i)
-	{
-		hists[i] = counter();
-	}
 
 	while ((readcount = reader (snd_file, data, BUFFER_LEN, snd_info.format)))
 	{	
@@ -62,7 +41,7 @@ AudioEntropy::AudioEntropy(std::string filename){
 	}
 
 	// Process mono channel with round up integer division
-	for (counter::iterator it = hists[snd_info.channels].begin(); it != hists[snd_info.channels].end(); ++it) {
+	for (counter::iterator it = hists.begin(); it != hists.end(); ++it) {
 		it->second = (it->second + (snd_info.channels - 1)) / snd_info.channels;
 	}
 	//print_histogram();
@@ -73,7 +52,7 @@ AudioEntropy::AudioEntropy(std::string filename){
 double AudioEntropy::entropy(){
 	double sum = 0;
 	double prob_A = 0;
-	for (counter::iterator it = hists[snd_info.channels].begin(); it != hists[snd_info.channels].end(); ++it)
+	for (counter::iterator it = hists.begin(); it != hists.end(); ++it)
 	{
 		prob_A = ((double)it->second / (double)snd_info.frames);
 		sum += prob_A * std::log2(prob_A);
@@ -87,21 +66,17 @@ void AudioEntropy::process_data(short *data, int count, int channels){
 	// Process channels
 	for (chan = 0 ; chan < channels ; chan ++) {
 		for (k = chan ; k < count ; k+= channels) {
-			hists[chan][ data[k] ]++;	
-			hists[snd_info.channels][ data[k] ] ++;	// Add values to mono channel
+			hists[ data[k] ] ++;	// Add values to mono channel
 		}
 	}
 }
 
 
 void AudioEntropy::print_histogram(){
-	for(int i = 0; i < snd_info.channels+1; ++i) 
+	std::cout << "channel " << 1 << "\n";
+	for (auto &e : hists)
 	{
-		std::cout << "channel " << i << "\n";
-		for (auto &e : hists[i])
-		{
-			std::cout << "[" << e.first << "] = " << e.second << '\n';	
-		}
+		std::cout << "[" << e.first << "] = " << e.second << '\n';	
 	}
 }
 
@@ -126,31 +101,6 @@ int AudioEntropy::reader(SNDFILE* sndfile, void* data_ptr, sf_count_t items, int
 		break;
 	}
 	return -1;
-}
-
-void AudioEntropy::save_histogram() {
-	std::ofstream fout("histogram.dat");
-	std::stringstream out;
-	for (auto const& x : hists[snd_info.channels]) {
-		out << x.first << " ";
-		for(int k = 0; k < snd_info.channels+1; k++) {
-			counter::iterator innerit = hists[k].find(x.first);
-			// Value in current map
-			if(hists[k].end() != innerit) {
-				out << hists[k][x.first] << " ";
-			}
-			else {
-				out << "0 ";
-			}
-		}
-		out << "\n";
-	}
-	fout << out.str();
-	fout.close();
-}
-
-const counter* AudioEntropy::get_counters(){
-	return hists;
 }
 
 SF_INFO AudioEntropy::get_snd_info() {

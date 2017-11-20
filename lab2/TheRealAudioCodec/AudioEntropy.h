@@ -17,20 +17,20 @@ class AudioEntropy
 public:
 	AudioEntropy();
 	AudioEntropy(std::string filename);
-	AudioEntropy(audio_data_t values);
+	AudioEntropy(audio_data_t const &values);
 	~AudioEntropy();
 	void process_data(short *data, int count, int channels);
 	void print_histogram();
 	int reader(SNDFILE* sndfile, void* data_ptr, sf_count_t items, int format);
-	void save_histogram();
+	//void save_histogram();
 	double entropy();
-	const counter* get_counters();
+	//const counter* get_counters();
 	SF_INFO get_snd_info();
 
 private:
 	unsigned int average(counter::value_type v);
 	SF_INFO snd_info;
 	SNDFILE* snd_file = NULL;
-	counter* hists;
+	counter hists;
 	int n_channels;
 };
