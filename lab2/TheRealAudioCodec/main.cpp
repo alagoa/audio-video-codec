@@ -15,6 +15,7 @@ int main(int argc, char const *argv[])
 	encoded_data_t encoded_data, encoded_file;
 	SF_INFO snd_info;
 	AudioReader *ar;
+	block_data_t block_d;
 	
 	//m = std::atoi(argv[2]);
 	ar = new AudioReader(argv[1]);
@@ -25,7 +26,8 @@ int main(int argc, char const *argv[])
 
 	// Encoding
 	Bitstream bs_write("encoded_bitstream.cod", "w");
-	order = predictor.predict(values);
+	order = 1; 
+	predictor.predict_blocks(values, block_d);
 	golomb.real_encode(values, &encoded_data);
 	m = golomb.get_m();
 	bs_write.writeFile(encoded_data, snd_info, order, m);
@@ -39,7 +41,8 @@ int main(int argc, char const *argv[])
 	encoded_file = bs_read.readFile(&new_snd_info, &dec_order, &new_m);
 	bs_read.close();
 	golomb.real_decode(encoded_file, &decoded, new_m);
-	predictor.reverse(decoded, dec_order);
+	//predictor.reverse(decoded, dec_order);
+	predictor.reverse_blocks(decoded, block_d);
 	a_out.write_values(decoded, new_snd_info);
 
 /* FAKE */

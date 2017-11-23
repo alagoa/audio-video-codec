@@ -1,6 +1,81 @@
 #include "Predictor.h"
 
+#define BLOCK_SIZE 8128
+
 Predictor::Predictor() {
+}
+
+void Predictor::predict_blocks(audio_data_t &values, block_data_t &b_data){
+	AudioEntropy *ae = new AudioEntropy(values);
+	std::cout << "Original entropy: " << ae->entropy() << "\n";
+	delete ae;
+	b_data.reserve(values.size());
+	short order;
+	for (int chan = 0; chan < values.size(); ++chan)
+	{
+		channel_data_t::iterator chan_begin = values[chan].begin();
+		channel_data_t::iterator chan_end = values[chan].end();
+		b_data.emplace_back();
+		b_data.back().reserve((values[chan].size() / BLOCK_SIZE)+1);
+		for (; chan_begin != chan_end;)
+		{
+			order = predict_single_block(chan_begin, chan_end, BLOCK_SIZE);
+			b_data[chan].push_back(block_header{order,0});
+		}
+	}
+	ae = new AudioEntropy(values);
+	std::cout << "Final entropy: " << ae->entropy() << "\n";
+	delete ae;
+}
+
+short Predictor::predict_single_block(channel_data_t::iterator &data_p, 
+	 								  channel_data_t::iterator data_end,
+	 								  uint block_size)
+{
+	const channel_data_t::iterator init = data_p;
+	#define ORDER_ 1
+	for (int o = 0; o < ORDER_; ++o)
+	{
+		data_p = init;
+		int last = *data_p;
+		for (; data_p < (init + block_size) - 1 && data_p != data_end-1; ++data_p) 
+		{
+			int conta = *(data_p + 1) - last;
+			last = *(data_p + 1);
+			*(data_p + 1) = conta;
+		}
+	}
+	data_p++;
+	return ORDER_;
+}
+
+void Predictor::reverse_blocks(audio_data_t &values, block_data_t const &b_data){
+	for (int chan = 0; chan < values.size(); ++chan)
+	{
+		channel_data_t::iterator chan_begin = values[chan].begin();
+		channel_data_t::iterator chan_end = values[chan].end();
+		for (uint i = 0; chan_begin != chan_end; i++)
+		{
+			short order = b_data[chan][i].order;
+			reverse_single_block(chan_begin, chan_end, BLOCK_SIZE, order);
+		}
+	}
+}
+
+void Predictor::reverse_single_block(channel_data_t::iterator &data_p, 
+	 channel_data_t::iterator data_end, uint block_size, short order)
+{
+	const channel_data_t::iterator init = data_p;
+	for (int o = 0; o < order; ++o)
+	{
+		data_p = init;
+		for (; data_p < (init + block_size) - 1 && data_p != data_end-1; ++data_p) 
+		{
+			*(data_p + 1) = *(data_p + 1) + *data_p;
+		}
+	}
+	data_p++;
+	return;
 }
 
 short Predictor::predict(audio_data_t &values) {
