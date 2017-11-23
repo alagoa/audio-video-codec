@@ -6,13 +6,13 @@ AudioEntropy::AudioEntropy(){
 
 AudioEntropy::~AudioEntropy(){
 	//free(hists);
-	sf_close(snd_file);
 }
 
 AudioEntropy::AudioEntropy(audio_data_t const &values) {
 	memset (&snd_info, 0, sizeof (snd_info)) ;
 	snd_info.frames = values[0].size();
 	snd_info.channels = values.size();
+	hists.reserve(values[0].size() * 2);
 	for (uint chan = 0 ; chan < values.size() ; chan ++) {
 		for (uint k = 0 ; k < values[0].size() ; k++) {	
 			hists[ values[chan][k] ] ++;	// Add values to mono channel
@@ -44,6 +44,7 @@ AudioEntropy::AudioEntropy(std::string filename){
 	for (counter::iterator it = hists.begin(); it != hists.end(); ++it) {
 		it->second = (it->second + (snd_info.channels - 1)) / snd_info.channels;
 	}
+	sf_close(snd_file);
 	//print_histogram();
 	//save_histogram();
 }

@@ -16,6 +16,8 @@ class Predictor {
 		 * @return     the order in which the entropy as smaller
 		 */
 		short predict(audio_data_t &values);
+		void predict_inter_channel(audio_data_t &values);
+		void reverse_inter_channel(audio_data_t &values);
 		/**
 		 * @brief      Reverse the residual values
 		 *

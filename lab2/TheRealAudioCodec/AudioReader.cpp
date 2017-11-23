@@ -35,19 +35,20 @@ int AudioReader::get_info(SF_INFO* info){
 
 void AudioReader::get_values(audio_data_t &values){
 	//values.push_back(snd_info.channels);
-	for (int i = 0; i < snd_info.channels; ++i)
-		values.push_back(channel_data_t(snd_info.frames));
+	values.reserve(snd_info.channels);
+	for (int i = 0; i < snd_info.channels; ++i){
+		values.emplace_back();
+		values.back().reserve(snd_info.frames);
+	}
 	short data [BUFFER_LEN];
 	int readcount;
-	int count = 0;
 	while((readcount = read(data))){
 		for (int i = 0; i < readcount; i += snd_info.channels)
 		{
 			for (int chan = 0; chan < snd_info.channels; ++chan)
 			{
-				values[chan][count] = data[i + chan];
+				values[chan].push_back(data[i + chan]);
 			}
-			count++;
 		}
 	}
 }
