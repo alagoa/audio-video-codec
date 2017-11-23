@@ -10,12 +10,14 @@ uint Golomb::real_encode(audio_data_t const &residuals, encoded_data_t *out) {
 	uint final_size;
 	golomb_transform_t tranformed_data;
 	final_size = find_m(residuals, tranformed_data);
+	out->reserve(residuals.size());
 	for(auto &e : tranformed_data) {
-		out->push_back(encoded_channel_t());
+		out->emplace_back();
+		out->back().reserve(residuals[0].size());
 		for(auto &v : e) {
 			q = v >> b;
 			r = v % m;
-			out->back().push_back(std::make_pair(q, r));
+			out->back().emplace_back(q, r);
 		 }
 	}
 	return final_size;
@@ -30,15 +32,16 @@ ushort Golomb::find_m(audio_data_t const &residuals, golomb_transform_t &transf_
 	b = 1;
 	std::cout << "Original size = " << original << "\n";
 	std::cout << "\tTrying m = " << tmp_m << "...\n";
+	transf_data.reserve(residuals.size());
 	for(auto &e : residuals) {
-		channel_transform_t channel;
+		transf_data.emplace_back();
+		transf_data.back().reserve(e.size());
 		for(auto &v : e) {
 			transf = v >= 0 ? 2*v : (2*(-v))-1;
 			q = transf / tmp_m;
 			final_size += ((q+1) + b);
-			channel.push_back(transf);
+			transf_data.back().emplace_back(transf);
 		 }
-		 transf_data.push_back(channel);
 	}
 	final_size = final_size/8;
 	std::cout << "\t\tsize for current m = " << final_size << "\n";
@@ -87,17 +90,19 @@ void Golomb::real_decode(encoded_data_t const &encoded, audio_data_t *decoded) {
 	int num;
 	int num_chan = encoded.size();
 	uint q, r;
-	int frames_per_chan = encoded[0].size();
+	uint frames_per_chan = encoded[0].size();
+	decoded->reserve(num_chan);
 	for (int i = 0; i < num_chan; ++i)
 	{
-		decoded->push_back(channel_data_t(frames_per_chan));
+		decoded->push_back(channel_data_t());
+		decoded->back().reserve(frames_per_chan);
 		for (int k = 0; k < frames_per_chan; ++k)
 		{
 	 		q = encoded[i][k].first;
 	 		r = encoded[i][k].second;
 	 		num = q*m + r;
 	 		num = num%2 == 0 ? num/2 : ((num/-2)-1);
-	 		decoded->back()[k] = num;
+	 		decoded->back().push_back(num);
 		}
 	}
 }
@@ -106,17 +111,19 @@ void Golomb::real_decode(encoded_data_t const &encoded, audio_data_t *decoded, u
 	int num;
 	int num_chan = encoded.size();
 	int q, r;
-	int frames_per_chan = encoded[0].size();
+	uint frames_per_chan = encoded[0].size();
+	decoded->reserve(num_chan);
 	for (int i = 0; i < num_chan; ++i)
 	{
-		decoded->push_back(channel_data_t(frames_per_chan));
+		decoded->emplace_back();
+		decoded->back().reserve(frames_per_chan);
 		for (int k = 0; k < frames_per_chan; ++k)
 		{
 	 		q = encoded[i][k].first;
 	 		r = encoded[i][k].second;
 	 		num = q * new_m + r;
 	 		num = num%2 == 0 ? num/2 : ((num/-2)-1);
-	 		decoded->back()[k] = num;
+	 		decoded->back().push_back(num);
 		}
 	}
 }

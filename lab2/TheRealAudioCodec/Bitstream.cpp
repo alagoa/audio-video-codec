@@ -126,14 +126,16 @@ encoded_data_t Bitstream::readFile(SF_INFO *new_snd_info, ushort *dec_order, ush
 	file.read((char*)dec_order, sizeof(ushort));
 	file.read((char*)new_m, sizeof(ushort));
 	b = std::log2(*new_m);
+	result.reserve(new_snd_info->channels);
 	for (int chan = 0; chan < new_snd_info->channels; ++chan)
 	{
-		result.push_back(encoded_channel_t());
+		result.emplace_back();
+		result.back().reserve(new_snd_info->frames);
 		for (int i = 0; i < new_snd_info->frames; ++i)
 		{
 			q = read_unary();
 			r = read_r(b);
-			result.back().push_back(std::make_pair(q,r));
+			result.back().emplace_back(q,r);
 		}
 	}
 	return result;

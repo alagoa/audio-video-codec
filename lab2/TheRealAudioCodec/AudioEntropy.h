@@ -5,12 +5,12 @@
 #include <sstream>
 #include <iostream>
 #include <cstring>
-#include <map>
+#include <unordered_map>
 #include <fstream>
 #include <algorithm>
 #include "structures.h"
 
-typedef std::map<int, unsigned int> counter;
+typedef std::unordered_map<int, unsigned int> counter;
 
 class AudioEntropy
 {

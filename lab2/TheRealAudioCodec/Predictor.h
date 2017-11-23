@@ -20,6 +20,9 @@ class Predictor {
 		short predict_single_block(channel_data_t::iterator &data_p, 
 	 							   channel_data_t::iterator data_end, 
 	 							   uint block_size);
+		void predict_inter_channel(audio_data_t &values);
+		void reverse_inter_channel(audio_data_t &values);
+
 		/**
 		 * @brief      Reverse the residual values
 		 *
