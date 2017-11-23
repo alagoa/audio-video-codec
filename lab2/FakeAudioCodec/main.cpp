@@ -14,7 +14,7 @@ int main(int argc, char const *argv[])
 
 	AudioReader *ar;
 	Predictor predictor;
-	Golomb golomb(512);
+	Golomb golomb(std::atoi(argv[2]));
 	AudioWriter a_out;
 	
 	memset (&snd_info, 0, sizeof (snd_info));
