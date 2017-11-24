@@ -28,9 +28,10 @@ int main(int argc, char const *argv[])
 	Bitstream bs_write("encoded_bitstream.cod", "w");
 	order = 1; 
 	predictor.predict_blocks(values, block_d);
-	golomb.real_encode(values, &encoded_data);
+	//golomb.real_encode(values, &encoded_data);
+	golomb.encode_blocks(values, block_d, &encoded_data);
 	m = golomb.get_m();
-	bs_write.writeFile(encoded_data, snd_info, order, m);
+	bs_write.writeFile_blocks(encoded_data, snd_info, block_d, BLOCK_SIZE);
 	bs_write.close();
 	
 	// Decoding
@@ -38,11 +39,14 @@ int main(int argc, char const *argv[])
 	SF_INFO new_snd_info;
 	ushort dec_order = -1, new_m = -1;
 	Bitstream bs_read("encoded_bitstream.cod", "r");
-	encoded_file = bs_read.readFile(&new_snd_info, &dec_order, &new_m);
+	//encoded_file = bs_read.readFile(&new_snd_info, &dec_order, &new_m);
+	block_data_t block_from_file;
+	encoded_file = bs_read.readFile_blocks(&new_snd_info, &block_from_file);
 	bs_read.close();
-	golomb.real_decode(encoded_file, &decoded, new_m);
+	//golomb.real_decode(encoded_file, &decoded, new_m);
+	golomb.decode_blocks(encoded_file, block_from_file, &decoded);
 	//predictor.reverse(decoded, dec_order);
-	predictor.reverse_blocks(decoded, block_d);
+	predictor.reverse_blocks(decoded, block_from_file);
 	a_out.write_values(decoded, new_snd_info);
 
 /* FAKE */

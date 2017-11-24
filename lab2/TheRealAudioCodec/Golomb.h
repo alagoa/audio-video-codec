@@ -28,6 +28,9 @@ class Golomb {
 		 * @return     The final size of the encoded data
 		 */
 		ushort find_m(audio_data_t const &residuals, golomb_transform_t &transf_data);
+		ushort find_block_m(channel_data_t::iterator data_p, 
+	 					   channel_data_t::iterator data_end,
+	 					   uint block_size);
 		ushort get_m(){return m;};
 		/**
 		 * @brief      Decode the vaules at encoded with the m found when encoding
@@ -36,6 +39,13 @@ class Golomb {
 		 * @param      decoded  Where the decoded values will be stored
 		 */
 		void real_decode(encoded_data_t const &encoded, audio_data_t *decoded);
+		void encode_blocks(audio_data_t const &residuals, block_data_t &b_data, encoded_data_t *out);
+		void encode_block(channel_data_t::iterator data_p, 
+	 					  		  channel_data_t::iterator data_end,
+	 					  		  encoded_channel_t::iterator encoded_begin,
+	 					  		  encoded_channel_t::iterator encoded_end,
+	 					  		  uint block_size,
+	 					  		  ushort m_block);
 		/**
 		 * @brief      Decode the vaules at encoded
 		 *
@@ -44,6 +54,15 @@ class Golomb {
 		 * @param[in]  new_m    The new m to be used
 		 */
 		void real_decode(encoded_data_t const &encoded, audio_data_t *decoded, ushort new_m);
+		void decode_block(encoded_channel_t::const_iterator encoded_begin,
+						  encoded_channel_t::const_iterator encoded_end,
+						  channel_data_t::iterator decoded_begin,
+						  channel_data_t::iterator decoded_end,
+						  uint block_size,
+						  ushort m_block);
+		void decode_blocks(encoded_data_t const &encoded,
+						   block_data_t &b_data, 
+						   audio_data_t *decoded);
 	private:
 		ushort m;
 		ushort b;

@@ -17,7 +17,7 @@ class Predictor {
 		 */
 		short predict(audio_data_t &values);
 		void predict_blocks(audio_data_t &values, block_data_t &b_data);
-		short predict_single_block(channel_data_t::iterator &data_p, 
+		block_header predict_single_block(channel_data_t::iterator &data_p, 
 	 							   channel_data_t::iterator data_end, 
 	 							   uint block_size);
 		void predict_inter_channel(audio_data_t &values);

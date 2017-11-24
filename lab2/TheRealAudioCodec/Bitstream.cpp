@@ -100,6 +100,48 @@ uint Bitstream::read_r(int b){
 	return r;
 }
 
+void Bitstream::writeFile_blocks(encoded_data_t const &golomb_encoded, 
+								 SF_INFO snd_info,
+								 block_data_t const &b_data, 
+								 ushort block_size)
+{
+	//write header
+	file.write((char*) &snd_info, sizeof(snd_info));
+	file.write((char*) &block_size, sizeof(block_size));
+	for (int chan = 0; chan < snd_info.channels; ++chan)
+	{
+		encoded_channel_t::const_iterator encoded_begin = golomb_encoded[chan].begin();
+		encoded_channel_t::const_iterator encoded_end = golomb_encoded[chan].end();
+		for (uint b = 0; b < b_data[chan].size(); ++b, encoded_begin += block_size){
+			//block_size = b_data[chan][b].size;
+			write_block(encoded_begin, encoded_end, block_size, b_data[chan][b]);
+		}
+	}
+}
+void Bitstream::write_block(encoded_channel_t::const_iterator data_p,
+							encoded_channel_t::const_iterator data_end,
+							ushort block_size,
+							block_header const &b_header)
+{
+	const encoded_channel_t::const_iterator data_init = data_p;
+	int b = std::log2(b_header.m);
+	//ushort block_size = b_header.size;
+	//if (w_buff_pos >= 0)
+	//{
+		write_r(b_header.order, 16);
+		write_r(b_header.m, 16);
+		write_r(b_header.size, 16);
+	//}
+	//else{
+	//	file.write((char*) &b_header, sizeof(b_header));
+	//}
+	for (; data_p < (data_init + block_size) && data_p != data_end; ++data_p)
+	{
+		write_unary(data_p->first);
+		write_r(data_p->second, b);
+	}
+}
+
 void Bitstream::writeFile(encoded_data_t const &golomb_encoded, SF_INFO snd_info, ushort order, ushort m) {
 	//ushort unary;
 	int b = std::log2(m);
@@ -116,7 +158,72 @@ void Bitstream::writeFile(encoded_data_t const &golomb_encoded, SF_INFO snd_info
 		}
 	}
 }
-	
+
+encoded_data_t Bitstream::readFile_blocks(SF_INFO *snd_info,
+								          block_data_t *b_data)
+{
+	encoded_data_t result;
+	ushort block_size;
+	ushort default_block_size;
+	file.read((char*)snd_info, sizeof(SF_INFO));
+	file.read((char*) &default_block_size, sizeof(default_block_size));
+	result.reserve(snd_info->channels);
+	b_data->reserve(snd_info->channels);
+	for (int chan = 0; chan < snd_info->channels; ++chan){
+		block_size = default_block_size;
+		result.emplace_back();
+		b_data->emplace_back();
+		result.back().reserve(snd_info->frames);
+		b_data->back().reserve((snd_info->frames/block_size) + 1);
+		double num_b = (double)snd_info->frames / (double)block_size;
+		for (uint block = 0; block < ceil(num_b) ; ++block){
+			block_header b_header;
+			//if (r_buff_pos >= 0)
+			//{
+				/*
+				char mask = ~(~0 << (r_buff_pos + 1));
+				char tmp = 0;
+				char tmp2 = 0;
+				file.read((char*) &b_header, sizeof(b_header));
+				
+				tmp =  b_header.order & mask;
+				b_header.order >>= r_buff_pos + 1;
+				b_header.order |= (r_buff & mask) << (7 - r_buff_pos);
+				
+				tmp2 = b_header.m & mask;
+				b_header.m >>= r_buff_pos + 1;
+				b_header.m |=  tmp << (7 - r_buff_pos);
+
+				tmp = b_header.size & mask;
+				b_header.size >>= r_buff_pos + 1;
+				b_header.size |=  tmp2 << (7 - r_buff_pos);
+
+				r_buff = tmp;
+				*/
+				//b_header.order = (short)read_r(16);
+				//b_header.m = (short)read_r(16);
+				//b_header.size = (ushort)read_r(16);
+			//}
+			//else{
+				b_header.order = (short)read_r(16);
+				b_header.m = (short)read_r(16);
+				b_header.size = (ushort)read_r(16);
+				//file.read((char*) &b_header, sizeof(b_header));
+			//}
+			block_size = b_header.size;
+			int b = std::log2(b_header.m);
+			b_data->back().push_back(b_header);
+			for (uint i = 0; i < block_size; ++i)
+			{
+				uint q = read_unary();
+				uint r = read_r(b);
+				result.back().emplace_back(q,r);
+			}
+		}
+	}
+	return result;
+}
+
 encoded_data_t Bitstream::readFile(SF_INFO *new_snd_info, ushort *dec_order, ushort *new_m) {
 	encoded_data_t result;
 	uint q, r;

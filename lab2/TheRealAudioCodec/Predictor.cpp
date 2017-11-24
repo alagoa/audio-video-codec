@@ -1,7 +1,5 @@
 #include "Predictor.h"
 
-#define BLOCK_SIZE 8128
-
 Predictor::Predictor() {
 }
 
@@ -9,6 +7,7 @@ void Predictor::predict_blocks(audio_data_t &values, block_data_t &b_data){
 	AudioEntropy *ae = new AudioEntropy(values);
 	std::cout << "Original entropy: " << ae->entropy() << "\n";
 	delete ae;
+	predict_inter_channel(values);
 	b_data.reserve(values.size());
 	short order;
 	for (int chan = 0; chan < values.size(); ++chan)
@@ -19,8 +18,8 @@ void Predictor::predict_blocks(audio_data_t &values, block_data_t &b_data){
 		b_data.back().reserve((values[chan].size() / BLOCK_SIZE)+1);
 		for (; chan_begin != chan_end;)
 		{
-			order = predict_single_block(chan_begin, chan_end, BLOCK_SIZE);
-			b_data[chan].push_back(block_header{order,0});
+			block_header b_dat = predict_single_block(chan_begin, chan_end, BLOCK_SIZE);
+			b_data[chan].push_back(b_dat);
 		}
 	}
 	ae = new AudioEntropy(values);
@@ -28,17 +27,18 @@ void Predictor::predict_blocks(audio_data_t &values, block_data_t &b_data){
 	delete ae;
 }
 
-short Predictor::predict_single_block(channel_data_t::iterator &data_p, 
+block_header Predictor::predict_single_block(channel_data_t::iterator &data_p, 
 	 								  channel_data_t::iterator data_end,
 	 								  uint block_size)
 {
 	const channel_data_t::iterator init = data_p;
+	ushort s;
 	#define ORDER_ 1
 	for (int o = 0; o < ORDER_; ++o)
 	{
 		data_p = init;
 		int last = *data_p;
-		for (; data_p < (init + block_size) - 1 && data_p != data_end-1; ++data_p) 
+		for (s = 0; data_p < (init + block_size) - 1 && data_p != data_end-1; ++data_p, ++s) 
 		{
 			int conta = *(data_p + 1) - last;
 			last = *(data_p + 1);
@@ -46,7 +46,7 @@ short Predictor::predict_single_block(channel_data_t::iterator &data_p,
 		}
 	}
 	data_p++;
-	return ORDER_;
+	return block_header{ORDER_, 0, s+1};
 }
 
 void Predictor::reverse_blocks(audio_data_t &values, block_data_t const &b_data){
@@ -56,10 +56,11 @@ void Predictor::reverse_blocks(audio_data_t &values, block_data_t const &b_data)
 		channel_data_t::iterator chan_end = values[chan].end();
 		for (uint i = 0; chan_begin != chan_end; i++)
 		{
-			short order = b_data[chan][i].order;
+			ushort order = b_data[chan][i].order;
 			reverse_single_block(chan_begin, chan_end, BLOCK_SIZE, order);
 		}
 	}
+	reverse_inter_channel(values);
 }
 
 void Predictor::reverse_single_block(channel_data_t::iterator &data_p, 
