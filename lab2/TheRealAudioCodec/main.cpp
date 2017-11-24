@@ -23,7 +23,7 @@ int &do_blocks, int &do_encode, int &do_decode)
 	po::options_description desc("Allowed options");
 	desc.add_options()
 	    ("help,h", 																"produce help message")
-	    ("input,i", po::value<std::string>(&input)->required(),					"input file")
+	    ("input,i", po::value<std::string>(&input),								"input file")
 	    ("order,k", po::value<short>(&order)->default_value(1),					"set order of the model, only used in block encoding")
 	    ("inter-channel,c", po::value<int>(&inter_chan)->default_value(1),		"inter-channel decorrelation")
 	    ("output,o", po::value<std::string>(&output)->default_value("out"),		"output file")
