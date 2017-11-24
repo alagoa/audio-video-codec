@@ -16,10 +16,10 @@ class Predictor {
 		 * @return     the order in which the entropy as smaller
 		 */
 		short predict(audio_data_t &values);
-		void predict_blocks(audio_data_t &values, block_data_t &b_data);
+		void predict_blocks(audio_data_t &values, block_data_t &b_data, short order);
 		block_header predict_single_block(channel_data_t::iterator &data_p, 
 	 							   channel_data_t::iterator data_end, 
-	 							   uint block_size);
+	 							   uint block_size, short order);
 		void predict_inter_channel(audio_data_t &values);
 		void reverse_inter_channel(audio_data_t &values);
 

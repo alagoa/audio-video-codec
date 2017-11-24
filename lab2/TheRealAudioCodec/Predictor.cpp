@@ -3,14 +3,14 @@
 Predictor::Predictor() {
 }
 
-void Predictor::predict_blocks(audio_data_t &values, block_data_t &b_data){
+void Predictor::predict_blocks(audio_data_t &values, block_data_t &b_data, short order){
 	AudioEntropy *ae = new AudioEntropy(values);
 	std::cout << "Original entropy: " << ae->entropy() << "\n";
 	delete ae;
 	predict_inter_channel(values);
 	b_data.reserve(values.size());
-	short order;
-	for (int chan = 0; chan < values.size(); ++chan)
+	//short order;
+	for (uint chan = 0; chan < values.size(); ++chan)
 	{
 		channel_data_t::iterator chan_begin = values[chan].begin();
 		channel_data_t::iterator chan_end = values[chan].end();
@@ -18,7 +18,7 @@ void Predictor::predict_blocks(audio_data_t &values, block_data_t &b_data){
 		b_data.back().reserve((values[chan].size() / BLOCK_SIZE)+1);
 		for (; chan_begin != chan_end;)
 		{
-			block_header b_dat = predict_single_block(chan_begin, chan_end, BLOCK_SIZE);
+			block_header b_dat = predict_single_block(chan_begin, chan_end, BLOCK_SIZE, order);
 			b_data[chan].push_back(b_dat);
 		}
 	}
@@ -29,12 +29,12 @@ void Predictor::predict_blocks(audio_data_t &values, block_data_t &b_data){
 
 block_header Predictor::predict_single_block(channel_data_t::iterator &data_p, 
 	 								  channel_data_t::iterator data_end,
-	 								  uint block_size)
+	 								  uint block_size, short order)
 {
 	const channel_data_t::iterator init = data_p;
-	ushort s;
-	#define ORDER_ 1
-	for (int o = 0; o < ORDER_; ++o)
+	ushort s = (ushort)block_size;
+	//#define ORDER_ 2
+	for (int o = 0; o < order; ++o)
 	{
 		data_p = init;
 		int last = *data_p;
@@ -46,11 +46,11 @@ block_header Predictor::predict_single_block(channel_data_t::iterator &data_p,
 		}
 	}
 	data_p++;
-	return block_header{ORDER_, 0, s+1};
+	return block_header{order, 0, (ushort)s+1};
 }
 
 void Predictor::reverse_blocks(audio_data_t &values, block_data_t const &b_data){
-	for (int chan = 0; chan < values.size(); ++chan)
+	for (uint chan = 0; chan < values.size(); ++chan)
 	{
 		channel_data_t::iterator chan_begin = values[chan].begin();
 		channel_data_t::iterator chan_end = values[chan].end();
@@ -84,7 +84,7 @@ void Predictor::predict_inter_channel(audio_data_t &values){
 		return;
 	}
 	//audio_data_t tmp;
-	for (int chan = 1; chan < values.size(); ++chan)
+	for (uint chan = 1; chan < values.size(); ++chan)
 	{
 		channel_data_t::iterator main = values[0].begin();
 		for (channel_data_t::iterator i = values[chan].begin(); i != values[chan].end(); ++i)
@@ -100,7 +100,7 @@ void Predictor::reverse_inter_channel(audio_data_t &values){
 	{
 		return;
 	}
-	for (int chan = 1; chan < values.size(); ++chan)
+	for (uint chan = 1; chan < values.size(); ++chan)
 	{
 		channel_data_t::iterator main = values[0].begin();
 		for (channel_data_t::iterator i = values[chan].begin(); i != values[chan].end(); ++i)

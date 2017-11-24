@@ -113,7 +113,6 @@ void Bitstream::writeFile_blocks(encoded_data_t const &golomb_encoded,
 		encoded_channel_t::const_iterator encoded_begin = golomb_encoded[chan].begin();
 		encoded_channel_t::const_iterator encoded_end = golomb_encoded[chan].end();
 		for (uint b = 0; b < b_data[chan].size(); ++b, encoded_begin += block_size){
-			//block_size = b_data[chan][b].size;
 			write_block(encoded_begin, encoded_end, block_size, b_data[chan][b]);
 		}
 	}
@@ -125,16 +124,9 @@ void Bitstream::write_block(encoded_channel_t::const_iterator data_p,
 {
 	const encoded_channel_t::const_iterator data_init = data_p;
 	int b = std::log2(b_header.m);
-	//ushort block_size = b_header.size;
-	//if (w_buff_pos >= 0)
-	//{
-		write_r(b_header.order, 16);
-		write_r(b_header.m, 16);
-		write_r(b_header.size, 16);
-	//}
-	//else{
-	//	file.write((char*) &b_header, sizeof(b_header));
-	//}
+	write_r(b_header.order, 16);
+	write_r(b_header.m, 16);
+	write_r(b_header.size, 16);
 	for (; data_p < (data_init + block_size) && data_p != data_end; ++data_p)
 	{
 		write_unary(data_p->first);
@@ -178,38 +170,9 @@ encoded_data_t Bitstream::readFile_blocks(SF_INFO *snd_info,
 		double num_b = (double)snd_info->frames / (double)block_size;
 		for (uint block = 0; block < ceil(num_b) ; ++block){
 			block_header b_header;
-			//if (r_buff_pos >= 0)
-			//{
-				/*
-				char mask = ~(~0 << (r_buff_pos + 1));
-				char tmp = 0;
-				char tmp2 = 0;
-				file.read((char*) &b_header, sizeof(b_header));
-				
-				tmp =  b_header.order & mask;
-				b_header.order >>= r_buff_pos + 1;
-				b_header.order |= (r_buff & mask) << (7 - r_buff_pos);
-				
-				tmp2 = b_header.m & mask;
-				b_header.m >>= r_buff_pos + 1;
-				b_header.m |=  tmp << (7 - r_buff_pos);
-
-				tmp = b_header.size & mask;
-				b_header.size >>= r_buff_pos + 1;
-				b_header.size |=  tmp2 << (7 - r_buff_pos);
-
-				r_buff = tmp;
-				*/
-				//b_header.order = (short)read_r(16);
-				//b_header.m = (short)read_r(16);
-				//b_header.size = (ushort)read_r(16);
-			//}
-			//else{
-				b_header.order = (short)read_r(16);
-				b_header.m = (short)read_r(16);
-				b_header.size = (ushort)read_r(16);
-				//file.read((char*) &b_header, sizeof(b_header));
-			//}
+			b_header.order = (short)read_r(16);
+			b_header.m = (short)read_r(16);
+			b_header.size = (ushort)read_r(16);
 			block_size = b_header.size;
 			int b = std::log2(b_header.m);
 			b_data->back().push_back(b_header);

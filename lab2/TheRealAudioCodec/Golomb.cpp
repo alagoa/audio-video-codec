@@ -16,7 +16,7 @@ void Golomb::encode_blocks(audio_data_t const &residuals, block_data_t &b_data, 
 		out->emplace_back(residuals[chan].size());
 		transf.emplace_back();
 		transf.back().reserve(residuals[chan].size());
-		for (int i = 0; i < residuals[chan].size(); ++i)
+		for (uint i = 0; i < residuals[chan].size(); ++i)
 		{
 			transf[chan].push_back(residuals[chan][i] >= 0 ? 2*residuals[chan][i] : (2*(-residuals[chan][i]))-1);
 		}
@@ -41,7 +41,7 @@ void Golomb::encode_block(channel_data_t::iterator data_p,
 	 					  ushort m_block)
 {
 	const channel_data_t::iterator init_data = data_p;
-	const encoded_channel_t::iterator init_encoded = encoded_begin;
+	//const encoded_channel_t::iterator init_encoded = encoded_begin;
 	for (; data_p < (init_data + block_size) && data_p != data_end && encoded_begin != encoded_end; ++data_p, ++encoded_begin){
 		uint q = *data_p / m_block;
 		uint r = *data_p % m_block;
@@ -177,7 +177,7 @@ void Golomb::decode_blocks(encoded_data_t const &encoded,
 						   audio_data_t *decoded)
 {
 	decoded->reserve(encoded.size());
-	for (int chan = 0; chan < encoded.size(); ++chan)
+	for (uint chan = 0; chan < encoded.size(); ++chan)
 	{
 		decoded->emplace_back(encoded[chan].size());
 		encoded_channel_t::const_iterator encoded_begin = encoded[chan].begin();
@@ -198,7 +198,7 @@ void Golomb::decode_block(encoded_channel_t::const_iterator encoded_begin,
 						  ushort m_block)
 {
 	int num;
-	const channel_data_t::iterator init_decoded = decoded_begin;
+	//const channel_data_t::iterator init_decoded = decoded_begin;
 	const encoded_channel_t::const_iterator init_encoded = encoded_begin;
 	for (; encoded_begin < (init_encoded + block_size) && encoded_begin != encoded_end && decoded_begin != decoded_end; ++decoded_begin, ++encoded_begin)
 	{
@@ -222,7 +222,7 @@ void Golomb::real_decode(encoded_data_t const &encoded, audio_data_t *decoded) {
 	{
 		decoded->push_back(channel_data_t());
 		decoded->back().reserve(frames_per_chan);
-		for (int k = 0; k < frames_per_chan; ++k)
+		for (uint k = 0; k < frames_per_chan; ++k)
 		{
 	 		q = encoded[i][k].first;
 	 		r = encoded[i][k].second;
@@ -243,7 +243,7 @@ void Golomb::real_decode(encoded_data_t const &encoded, audio_data_t *decoded, u
 	{
 		decoded->emplace_back();
 		decoded->back().reserve(frames_per_chan);
-		for (int k = 0; k < frames_per_chan; ++k)
+		for (uint k = 0; k < frames_per_chan; ++k)
 		{
 	 		q = encoded[i][k].first;
 	 		r = encoded[i][k].second;
