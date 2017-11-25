@@ -27,6 +27,9 @@ short Predictor::predict(audio_data_t &values) {
 		}
 		ae = new AudioEntropy(tmp);
 		current_entropy = ae->entropy();
+		if(order == 2) {
+			ae->save_histogram();
+		}
 		if(current_entropy >= prev_entropy) {
 			next_order = false;
 			std::cout << "Chosen order: " << order-1 << "\n";
