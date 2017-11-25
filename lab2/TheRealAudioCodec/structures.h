@@ -3,7 +3,9 @@
 
 #include <vector>
 #define BUFFER_LEN 1024
+
 #define BLOCK_SIZE 2048
+//#define BLOCK_SIZE 1024
 
 typedef std::vector< int > channel_data_t;
 typedef std::vector< channel_data_t > audio_data_t;

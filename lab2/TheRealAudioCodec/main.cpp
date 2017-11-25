@@ -156,9 +156,9 @@ inline void encode_file(std::string input, std::string output, short order, int 
 	if (do_blocks)
 	{
 		block_data_t block_d;
-		predictor.predict_blocks(values, block_d, order);
+		predictor.predict_blocks(values, block_d, order, do_blocks);
 		golomb.encode_blocks(values, block_d, &encoded_data);
-		bs_write.writeFile_blocks(encoded_data, snd_info, block_d, BLOCK_SIZE);
+		bs_write.writeFile_blocks(encoded_data, snd_info, block_d, do_blocks);
 	}
 	else{
 		int m;
