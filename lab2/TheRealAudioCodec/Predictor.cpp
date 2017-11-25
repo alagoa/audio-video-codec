@@ -3,7 +3,7 @@
 Predictor::Predictor() {
 }
 
-void Predictor::predict_blocks(audio_data_t &values, block_data_t &b_data, short order){
+void Predictor::predict_blocks(audio_data_t &values, block_data_t &b_data, short order, ushort block_size){
 	AudioEntropy *ae = new AudioEntropy(values);
 	std::cout << "Original entropy: " << ae->entropy() << "\n";
 	delete ae;
@@ -15,10 +15,10 @@ void Predictor::predict_blocks(audio_data_t &values, block_data_t &b_data, short
 		channel_data_t::iterator chan_begin = values[chan].begin();
 		channel_data_t::iterator chan_end = values[chan].end();
 		b_data.emplace_back();
-		b_data.back().reserve((values[chan].size() / BLOCK_SIZE)+1);
+		b_data.back().reserve((values[chan].size() / block_size)+1);
 		for (; chan_begin != chan_end;)
 		{
-			block_header b_dat = predict_single_block(chan_begin, chan_end, BLOCK_SIZE, order);
+			block_header b_dat = predict_single_block(chan_begin, chan_end, block_size, order);
 			b_data[chan].push_back(b_dat);
 		}
 	}
@@ -57,7 +57,7 @@ void Predictor::reverse_blocks(audio_data_t &values, block_data_t const &b_data)
 		for (uint i = 0; chan_begin != chan_end; i++)
 		{
 			ushort order = b_data[chan][i].order;
-			reverse_single_block(chan_begin, chan_end, BLOCK_SIZE, order);
+			reverse_single_block(chan_begin, chan_end, b_data[chan][i].size, order);
 		}
 	}
 	reverse_inter_channel(values);

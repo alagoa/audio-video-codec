@@ -9,7 +9,8 @@ Golomb::Golomb(){
 void Golomb::encode_blocks(audio_data_t const &residuals, block_data_t &b_data, encoded_data_t *out){
 	audio_data_t transf;
 	transf.reserve(residuals.size());
-	ushort m_block; 
+	ushort m_block;
+	ushort block_size;
 	out->reserve(residuals.size());
 	for (uint chan = 0; chan < residuals.size(); ++chan)
 	{
@@ -24,11 +25,12 @@ void Golomb::encode_blocks(audio_data_t const &residuals, block_data_t &b_data, 
 		channel_data_t::iterator chan_end = transf[chan].end();
 		encoded_channel_t::iterator encoded_begin = (*out).back().begin();
 		encoded_channel_t::iterator encoded_end = (*out).back().end();
-		for (uint b = 0; b < b_data[chan].size(); ++b, chan_begin += BLOCK_SIZE, encoded_begin+=BLOCK_SIZE)
+		block_size = b_data[chan][0].size;
+		for (uint b = 0; b < b_data[chan].size(); ++b, chan_begin += block_size, encoded_begin+=block_size)
 		{
-			m_block = find_block_m(chan_begin, chan_end, BLOCK_SIZE);
+			m_block = find_block_m(chan_begin, chan_end, block_size);
 			b_data[chan][b].m = m_block;
-			encode_block(chan_begin, chan_end, encoded_begin, encoded_end, BLOCK_SIZE, m_block);
+			encode_block(chan_begin, chan_end, encoded_begin, encoded_end, block_size, m_block);
 		}
 	}
 }
@@ -61,9 +63,9 @@ ushort Golomb::find_block_m(channel_data_t::iterator data_p,
 	while(tmp_m < std::pow(2, 15)) {
 		std::cout << "\tTrying m = " << tmp_m << "...\n";
 		//add b for each value
-		final_size += b * BLOCK_SIZE;
+		final_size += b * block_size;
 		//add 1 as in (q+1) for each value
-		final_size += BLOCK_SIZE;
+		final_size += block_size;
 		//if it is already bigger we can discard this b
 		if (final_size/8 > min_size)
 		{
@@ -176,6 +178,7 @@ void Golomb::decode_blocks(encoded_data_t const &encoded,
 						   block_data_t &b_data, 
 						   audio_data_t *decoded)
 {
+	ushort block_size;
 	decoded->reserve(encoded.size());
 	for (uint chan = 0; chan < encoded.size(); ++chan)
 	{
@@ -184,8 +187,9 @@ void Golomb::decode_blocks(encoded_data_t const &encoded,
 		encoded_channel_t::const_iterator encoded_end = encoded[chan].end();
 		channel_data_t::iterator decoded_begin = (*decoded).back().begin();
 		channel_data_t::iterator decoded_end = (*decoded).back().end();
-		for (uint b = 0; b < b_data[chan].size(); ++b, decoded_begin += BLOCK_SIZE, encoded_begin+=BLOCK_SIZE){
-			decode_block(encoded_begin, encoded_end, decoded_begin, decoded_end, BLOCK_SIZE, b_data[chan][b].m);
+		block_size = b_data[chan][0].size;
+		for (uint b = 0; b < b_data[chan].size(); ++b, decoded_begin += block_size, encoded_begin+=block_size){
+			decode_block(encoded_begin, encoded_end, decoded_begin, decoded_end, block_size, b_data[chan][b].m);
 		}
 	}
 }	
