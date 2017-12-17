@@ -1,16 +1,17 @@
-P=
-OBJECTS= FCM.o main.o
-DEBUG_OBJ= FCM_debug.o main_debug.o
-# BOOSTFLAGS=-lboost_system -lboost_serialization -lboost_program_options -lboost_filesystem
+P=Player
+OBJECTS= Player.o VideoFile.o main.o
+EBUG_OBJ= Player_debug.o VideoFile_debug.o main_debug.o
+BOOSTFLAGS=-lboost_system -lboost_program_options -lboost_filesystem
 CFLAGS = -Wall -O3 -g
 CFLAGS_DEBUG = -Wall -g
 LDLIBS=
+OPENCV=`pkg-config opencv --cflags --libs`
 CC=g++
 
 all: $(P)
 # Generate application
 $(P): $(OBJECTS)
-	$(CC) $(CFLAGS) -o $(P) $(BOOSTFLAGS) $(OBJECTS)
+	$(CC) $(CFLAGS) -o $(P) $(OBJECTS) $(OPENCV) $(BOOSTFLAGS)
 # Generate object files
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c $< -o$@
