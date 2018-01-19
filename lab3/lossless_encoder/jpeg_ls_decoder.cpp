@@ -182,7 +182,6 @@ void jpeg_ls_decoder::update_ctx(int q, int errval){
 
 void jpeg_ls_decoder::new_sample(std::vector<std::vector<int>> const &encoded){
     if (index >= x){
-
         sample.c = last_line[0];
         last_line[0] = last_line[1];
         sample.a = last_line[0];
@@ -194,8 +193,9 @@ void jpeg_ls_decoder::new_sample(std::vector<std::vector<int>> const &encoded){
         return;
     }
     sample.a = sample.x;
-    sample.b = sample.d;
     sample.c = sample.b;
+    sample.b = sample.d;
+
     sample.d = last_line[index + 2]; //i+2?
     last_line[index] = (uchar)sample.x;
     index++;
