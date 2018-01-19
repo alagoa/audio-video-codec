@@ -6,8 +6,8 @@
 
 jpeg_ls::jpeg_ls(cv::Mat *frame): frame(frame){
 	range = MAXVAL + 1; //= ((MAXVAL + 2 * NEAR) / (2 * NEAR)) + 1;
-	qbpp = std::log2(range);
-    bpp =  MAX(2, std::log2(MAXVAL + 1));
+	//qbpp = std::log2(range);              future improv
+    //bpp =  MAX(2, std::log2(MAXVAL + 1));
 	//limit?
 	int tmp = MAX(2, (range + 32) / 64);
 	for (int i = 0; i < 367; ++i)
@@ -38,6 +38,7 @@ jpeg_ls::jpeg_ls(cv::Mat *frame): frame(frame){
     current_line[0] = 0;
     error_codes.reserve(x_size * y_size);
     eof = 0;
+    final_size = 0;
 }
 
 jpeg_ls::~jpeg_ls() {
@@ -52,9 +53,10 @@ void jpeg_ls::error_coding(int residual, int k){
     mask = K_MASK(k);
     q = (residual & (~mask)) >> k;
     r = residual & mask;
-    std::vector<int> tmp = std::vector<int>(2);
+    g_pair_t tmp = g_pair_t(2);
     tmp[0] = q;
     tmp[1] = r;
+    final_size += k + q + 1;
     error_codes.push_back(tmp);
 }
 
@@ -73,7 +75,6 @@ void jpeg_ls::next_sample(){
 	current_sample.c = last_line[index - 1];
 	current_sample.d = last_line[index + 1];
 	current_sample.x = current_line[index];
-    std::cout << "sample: x: " << current_sample.x << "\n";
 	index++;
 }
 
@@ -103,7 +104,7 @@ void jpeg_ls::encode_sample(){
 
 	//quantize context
 
-	for (int i = 0; i < 3; ++i){
+	for (int i = 0; i < 3; ++i){ //make LUT
 		if (D[i] <= -T3)
 			Q[i] = -4;
 		else if (D[i] <= -T2)
@@ -232,10 +233,11 @@ void jpeg_ls::update_ctx(int q, int errval){
 	}
 }
 
-std::vector<std::vector<int>> jpeg_ls::encode_frame() {
+encoded_t jpeg_ls::encode_frame() {
     while (eof == 0){
         next_sample();
         encode_sample();
     }
+    std::cout << "Encoded size: " << final_size / 8 << "\n";
     return error_codes;
 }

@@ -9,6 +9,9 @@
 #define RESET 64
 #define MAPPING(q) (((q)[0] * 9 + (q)[1]) * 9 + (q)[2])
 
+#include <vector>
+typedef std::vector<uchar> g_pair_t;
+typedef std::vector<g_pair_t> encoded_t;
 typedef struct{
     int a;
     int b;

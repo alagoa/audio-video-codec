@@ -1,7 +1,6 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <cmath>
-#include <vector>
 #include <cstdlib>
 #include <cstring>
 #include "Structures.h"
@@ -20,8 +19,9 @@ public:
 	void update_ctx(int q, int errval);
 	int new_line();
     void error_coding(int residual, int k);
-    std::vector<std::vector<int>> encode_frame();
+    encoded_t encode_frame();
 private:
+    size_t final_size;
 	int range;
 	//const int near;
 	cv::Mat* frame;
@@ -33,9 +33,9 @@ private:
     uchar* last_line;
     uchar* current_line;
     sample_t current_sample;
-    std::vector<std::vector<int>> error_codes;
-	int bpp;
-	int qbpp;
+    encoded_t error_codes;
+	//int bpp;
+	//int qbpp;
 	int N[367];
 	int A[367];
 	int B[365];

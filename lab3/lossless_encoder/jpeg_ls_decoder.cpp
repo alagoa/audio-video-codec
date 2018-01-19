@@ -6,9 +6,7 @@
 #define MAXVAL 255
 jpeg_ls_decoder::jpeg_ls_decoder(int x, int y) : x(x), y(y){
     int tmp;
-    eof = 0;
     index = 1;
-    row = 0;
     range = MAXVAL + 1;
     tmp = MAX(2, (range + 32) / 64);
     for (int i = 0; i < 367; ++i)
@@ -21,7 +19,6 @@ jpeg_ls_decoder::jpeg_ls_decoder(int x, int y) : x(x), y(y){
         B[i] = 0;
         C[i] = 0;
     }
-
     last_line = (uchar*)std::calloc((x + 2), sizeof(uchar));
     if(last_line == NULL){
         std::cout << "ERROR malloc l_line\n";
@@ -30,10 +27,10 @@ jpeg_ls_decoder::jpeg_ls_decoder(int x, int y) : x(x), y(y){
 }
 
 jpeg_ls_decoder::~jpeg_ls_decoder() {
-
+    free(last_line);
 }
 
-cv::Mat jpeg_ls_decoder::decode(std::vector<std::vector<int>> const &encoded) {
+cv::Mat jpeg_ls_decoder::decode(encoded_t const &encoded) {
     cv::Mat im(x,y, CV_8U);
     for (int p = 0; p < encoded.size(); ++p) {
         int D[3];
@@ -143,7 +140,7 @@ cv::Mat jpeg_ls_decoder::decode(std::vector<std::vector<int>> const &encoded) {
         update_bias(ctx_id);
         sample.x = pix;
         im.data[p] = ((uchar)pix);
-        new_sample(encoded);
+        new_sample();
     }
     return im;
 }
@@ -180,7 +177,7 @@ void jpeg_ls_decoder::update_ctx(int q, int errval){
     ++N[q];
 }
 
-void jpeg_ls_decoder::new_sample(std::vector<std::vector<int>> const &encoded){
+void jpeg_ls_decoder::new_sample(){
     if (index >= x){
         sample.c = last_line[0];
         last_line[0] = last_line[1];
