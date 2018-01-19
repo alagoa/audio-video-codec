@@ -208,8 +208,8 @@ void jpeg_ls::update_ctx(int q, int errval){
 	A[q] += abs(errval);
 	if (N[q] == RESET){
 		A[q] >>= 1;
-		if (B[q] >=123456gg
-            
+		if (B[q] >= 0)
+            B[q] >>= 1;
 		else
 			B[q] = -((1 - B[q]) >> 1);
 		N[q] >>= 1;
