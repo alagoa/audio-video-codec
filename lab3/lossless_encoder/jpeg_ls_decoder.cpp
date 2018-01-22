@@ -5,9 +5,9 @@
 #include "jpeg_ls_decoder.h"
 #define MAXVAL 255
 jpeg_ls_decoder::jpeg_ls_decoder(int x, int y) : x(x), y(y){
-    int tmp;
-    index = 1;
     range = MAXVAL + 1;
+    index = 1;
+    int tmp;
     tmp = MAX(2, (range + 32) / 64);
     for (int i = 0; i < 367; ++i)
     {
@@ -31,18 +31,19 @@ jpeg_ls_decoder::~jpeg_ls_decoder() {
 }
 
 cv::Mat jpeg_ls_decoder::decode(encoded_t const &encoded) {
-    cv::Mat im(x,y, CV_8U);
+    cv::Mat im(y, x, CV_8U);
     for (int p = 0; p < encoded.size(); ++p) {
-        int D[3];
         int Q[3];
-        int sign = 1;
+        int sign;
         int ctx_id;
         int Px;
         int pix;
         int k;
-        D[0] = sample.d - sample.b;
-        D[1] = sample.b - sample.c;
-        D[2] = sample.c - sample.a;
+        Q[0] = lut_grad[sample.d - sample.b];
+        Q[1] = lut_grad[sample.b - sample.c];
+        Q[2] = lut_grad[sample.c - sample.a];
+
+        /*
         for (int i = 0; i < 3; ++i){
             if (D[i] <= -T3)
                 Q[i] = -4;
@@ -63,13 +64,16 @@ cv::Mat jpeg_ls_decoder::decode(encoded_t const &encoded) {
             else
                 Q[i] =  4;
         }
-
+        */
         ctx_id = MAPPING(Q);
-        //ctx_id =  ctx_id ^ (ctx_id >> ((8*sizeof(int)) - 1));
+        sign = ctx_id >> (INT_SIZE - 1);
+        ctx_id = (ctx_id ^ sign) - sign;
+        /*
         if (ctx_id < 0){
             sign = -1;
             ctx_id = -ctx_id;
         }
+        */
 
         int max_a_b = MAX(sample.a, sample.b);
         int min_a_b = MIN(sample.a, sample.b);
@@ -83,7 +87,7 @@ cv::Mat jpeg_ls_decoder::decode(encoded_t const &encoded) {
                 Px = sample.a + sample.b - sample.c;
         }
 
-        if (sign == 1)
+        if (sign == 0)
             Px += C[ctx_id];
         else
             Px -= C[ctx_id];
@@ -122,8 +126,9 @@ cv::Mat jpeg_ls_decoder::decode(encoded_t const &encoded) {
         }
 
         update_ctx(ctx_id, err);
-        if(sign == -1)
-            err = -err;
+        err = (err ^ sign) - sign;
+        //if(sign == -1)
+        //    err = -err;
 
         pix = (err + Px) % range; //real value!
 

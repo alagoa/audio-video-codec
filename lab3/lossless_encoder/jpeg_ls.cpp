@@ -53,11 +53,9 @@ void jpeg_ls::error_coding(int residual, int k){
     mask = K_MASK(k);
     q = (residual & (~mask)) >> k;
     r = residual & mask;
-    g_pair_t tmp = g_pair_t(2);
-    tmp[0] = q;
-    tmp[1] = r;
-    final_size += k + q + 1;
+    g_pair_t tmp = {q, r};
     error_codes.push_back(tmp);
+    final_size += k + q + 1;
 }
 
 void jpeg_ls::next_sample(){
@@ -88,7 +86,6 @@ int jpeg_ls::new_line(){
 }
 
 void jpeg_ls::encode_sample(){
-	int D[3];
     int Q[3];
     int sign;
     int m;
@@ -96,16 +93,17 @@ void jpeg_ls::encode_sample(){
     int max_a_b;
     int min_a_b;
     int errval;
-    D[0] = current_sample.d - current_sample.b;
-	D[1] = current_sample.b - current_sample.c;
-	D[2] = current_sample.c - current_sample.a;
-	//check mode
+    Q[0] = lut_grad[current_sample.d - current_sample.b];
+    Q[1] = lut_grad[current_sample.b - current_sample.c];
+    Q[2] = lut_grad[current_sample.c - current_sample.a];
+    //check mode
 	//if normal mode
 
 	//quantize context
-
+    /*
 	for (int i = 0; i < 3; ++i){ //make LUT
-		if (D[i] <= -T3)
+
+        if (D[i] <= -T3)
 			Q[i] = -4;
 		else if (D[i] <= -T2)
 		 	Q[i] = -3;
@@ -124,12 +122,17 @@ void jpeg_ls::encode_sample(){
 		else
 			Q[i] =  4;
 	}
+    */
+
     m = MAPPING(Q);
-    sign = 1;
+    sign = m >> (INT_SIZE - 1); //get m sign; -1 or 0
+    m = (m ^ sign) - sign;
+    /*
     if (m < 0){
      sign = -1;
         m = -m;
     }
+    */
 
 	//prediction
 	max_a_b = MAX(current_sample.a, current_sample.b);
@@ -145,7 +148,7 @@ void jpeg_ls::encode_sample(){
  	}
 
  	//prediction correction
- 	if (sign == 1)
+ 	if (sign == 0)
  		Px += C[m];
  	else
  		Px -= C[m];
@@ -157,8 +160,11 @@ void jpeg_ls::encode_sample(){
 
  	//prediction error
  	errval = current_sample.x - Px;
+    errval = (errval ^ sign) - sign;
+ 	/*
  	if (sign == -1)
  		errval = -errval;
+    */
 
  	/* FOR NEAR LOSSLESS
  	if (Errval > 0)
@@ -238,6 +244,6 @@ encoded_t jpeg_ls::encode_frame() {
         next_sample();
         encode_sample();
     }
-    std::cout << "Encoded size: " << final_size / 8 << "\n";
+    std::cout << "Encoded size : " << final_size / 8 << " bytes\n";
     return error_codes;
 }
